@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const ObjectId = mongoose.Types.ObjectId
 
 const orderSchema = new mongoose.schema({
+
     userId: {
         type: ObjectId,
         required: true,
@@ -60,6 +61,7 @@ const orderSchema = new mongoose.schema({
         type: Boolean,
         default: false
     },
+    
 }, { timestamps: true })
 
 mongoose.exports = mongoose.model('orderModel', orderSchema)
