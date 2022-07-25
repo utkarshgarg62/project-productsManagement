@@ -1,4 +1,4 @@
-// const mongoose = require("mongoose")
+const mongoose = require("mongoose")
 
 //Value Validation
 const isValid = function(value){
@@ -7,6 +7,15 @@ const isValid = function(value){
     return true
 }
 
+
+//ObjectId Validation
+const  isValidObjectId =function(id){
+    var ObjectId = mongoose.Types.ObjectId;
+    return ObjectId.isValid(id)
+}
+
+
 module.exports={
-    isValid
+    isValid,
+    isValidObjectId
 }
