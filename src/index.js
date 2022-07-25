@@ -1,13 +1,13 @@
-const express= require('express')
-const bodyparser=require('body-parser')
-const route=require('./route/route')
-const mongoose=require('mongoose')
+const express = require('express')
+const bodyparser = require('body-parser')
+const route = require('./route/route')
+const mongoose = require('mongoose')
 // const multer=require("multer")
 
 
-const app=express()
+const app = express()
 app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({extended:true}))
+app.use(bodyparser.urlencoded({ extended: true }))
 // app.use(multer().any())
 
 //===================================================Data-Base Connection=================================================================
@@ -16,14 +16,14 @@ app.use(bodyparser.urlencoded({extended:true}))
 mongoose.connect("mongodb+srv://functionup-radon-cohort:radon123@cluster0.zbsotuc.mongodb.net/group17Database?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
-// .then( () => console.log("MongoDb is connected"))
-.catch ( err => console.log(err) )
+    // .then( () => console.log("MongoDb is connected"))
+    .catch(err => console.log(err))
 
 
 //========================================================================================================================================
 
 
-app.use('/', route)  
+app.use('/', route)
 
 
 app.listen(process.env.PORT || 3000, function () {

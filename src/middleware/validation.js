@@ -1,26 +1,26 @@
 const mongoose = require("mongoose")
 
 //Request Body Validation
-const isValidReqBody = function(requestBody) {
-    return Object.keys(requestBody).length > 0; 
+const isValidReqBody = function (requestBody) {
+    return Object.keys(requestBody).length > 0;
 };
 
 
 //Value Validation
-const isValid = function(value){
-    if(typeof value ==='undefined' || value ===null)  return false
-    if(typeof value ==='string' && value.trim().length ===0)return false
+const isValid = function (value) {
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === 'string' && value.trim().length === 0) return false
     return true
 }
 
 //Name Validation
-const isValidName =function(name){
-    const  nameRegex =/^[a-zA-Z]{2,30}$/
+const isValidName = function (name) {
+    const nameRegex = /^[a-zA-Z]{2,30}$/
     return nameRegex.test(name)
 }
 
 //Email Validation
-const isValidEmail = function(email){
+const isValidEmail = function (email) {
     const emailRegex = /^[a-z0-9][a-z0-9-_\.]+@([a-z]|[a-z0-9]?[a-z0-9-]+[a-z0-9])\.[a-z0-9]{2,10}(?:\.[a-z]{2,10})?$/
     return emailRegex.test(email)
 }
@@ -32,19 +32,19 @@ const isValidMobile = function (mobile) {
 }
 
 //Password Validation
-const isValidPassword = function(password){
+const isValidPassword = function (password) {
     const passRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/
     return passRegex.test(password)
 }
 
 //ObjectId Validation
-const  isValidObjectId =function(id){
+const isValidObjectId = function (id) {
     var ObjectId = mongoose.Types.ObjectId;
     return ObjectId.isValid(id)
 }
 
 
-module.exports={
+module.exports = {
     isValidReqBody,
     isValid,
     isValidObjectId,
