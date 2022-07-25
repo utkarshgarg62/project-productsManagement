@@ -16,7 +16,7 @@ app.use(bodyparser.urlencoded({extended:true}))
 mongoose.connect("mongodb+srv://functionup-radon-cohort:radon123@cluster0.zbsotuc.mongodb.net/group17Database?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
-.then( () => console.log("MongoDb is connected"))
+// .then( () => console.log("MongoDb is connected"))
 .catch ( err => console.log(err) )
 
 
@@ -28,4 +28,4 @@ app.use('/', route)
 
 app.listen(process.env.PORT || 3000, function () {
     console.log('Express app running on port ' + (process.env.PORT || 3000))
-});
+}); 
