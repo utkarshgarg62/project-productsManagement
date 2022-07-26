@@ -5,6 +5,12 @@ const isValidReqBody = function (requestBody) {
     return Object.keys(requestBody).length > 0;
 };
 
+//String Validation
+const isValidString = function(value){
+    if(typeof value ==='string' && value.trim().length === 0)return false
+    return true
+}
+
 
 //Value Validation
 const isValid = function (value) {
@@ -49,6 +55,7 @@ module.exports = {
     isValid,
     isValidObjectId,
     isValidName,
+    isValidString,
     isValidEmail,
     isValidMobile,
     isValidPassword
