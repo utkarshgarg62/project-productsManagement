@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel')
-const { isValid, isValidObjectId, isValidName, isValidString,isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
-const bcrypt = require('bcrypt');
+const { isValid, isValidObjectId, isValidName, isValidString, isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
+const bcrypt = require('bcrypt');  //<== salt and hash 
 const saltRounds = 10;
 const jwt = require("jsonwebtoken")
 
@@ -184,56 +184,53 @@ const updateUser = async function (req, res) {
 
         if (Object.keys(data).length < 1) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
-        if (fname) {
 
-            if (data.hasOwnProperty("fname")) {
-                if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
-                if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname" }) }
-            }
+        if (data.hasOwnProperty("fname")) {
+            if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
+            if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname !" }) }
         }
 
-        if (lname) {
-            if (!isValidName(lname)) {
-                return res.status(400).send({ status: false, message: "LastName is not Valid !" })
-            }
+
+        if (data.hasOwnProperty("lname")) {
+            if (!isValid(lname)) { return res.status(400).send({ status: false, message: "Please Provide Last Name" }) }
+            if (!isValidName(lname)) { return res.status(400).send({ status: false, message: "Enter a Valid Lname !" }) }
         }
 
-        if (email) {
-            if (!isValidEmail(email)) {
-                return res.status(400).send({ status: false, message: "Email is not Valid !" })
-            }
+        if (data.hasOwnProperty("email")) {
+            if (!isValid(email)) { return res.status(400).send({ status: false, message: "Please Provide Email" }) }
+            if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email !" }) }
+
             let checkEmail = await userModel.findOne({ email: email })
             if (checkEmail) return res.status(400).send({ status: false, message: "Email already exists" })
         }
 
-        if (profileImage) {
+        if (data.hasOwnProperty("profileImage")) {
             if (!isValidName(profileImage)) {
                 return res.status(400).send({ status: false, message: "ProfileImage is missing ! " })
             }
         }
 
-        if (phone) {
+        if (data.hasOwnProperty("phone")) {
+            if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
             if (!isValidMobile(phone)) {
-                return res.status(400).send({ status: false, message: "phone number is missing ! " })
+                return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " })
 
             } let checkPhone = await userModel.findOne({ phone: phone })
             if (checkPhone) return res.status(400).send({ status: false, message: "Phone Number already exists" })
         }
 
-        if (password) {
+        if (data.hasOwnProperty("password")) {
+            if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
             if (!isValidPassword(password)) {
                 return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" })
             }
-            const hash = bcrypt.hashSync(password, saltRounds);     // <== 
+
+
+            const hash = bcrypt.hashSync(password, saltRounds);     
             data.password = hash
         }
 
-        // if (address) {
-        //     if (!isValidPassword(password)) {
-        //         return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" })
-        //     }
-        // }
-
+     
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
         res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
 
