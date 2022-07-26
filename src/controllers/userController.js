@@ -184,47 +184,44 @@ const updateUser = async function (req, res) {
 
         if (Object.keys(data).length < 1) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
-        if (fname) {
-            // if (!isValidString(fname)) {
-            //     return res.status(400).send({ status: false, message: "FirstName is not Present !" })
-            // }
-            if (fname == null) {
-                return res.status(400).send({ status: false, message: "FirstName is not Present !" })
-            }
-            if (!isValidName(fname)) {
-                return res.status(400).send({ status: false, message: "FirstName is not Valid !" })
-            }
+
+
+        if (data.hasOwnProperty("fname")) {
+            if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
+            if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname !" }) }
         }
 
-        if (lname) {
-            if (!isValidName(lname)) {
-                return res.status(400).send({ status: false, message: "LastName is not Valid !" })
-            }
+
+        if (data.hasOwnProperty("lname")) {
+            if (!isValid(lname)) { return res.status(400).send({ status: false, message: "Please Provide Last Name" }) }
+            if (!isValidName(lname)) { return res.status(400).send({ status: false, message: "Enter a Valid Lname !" }) }
         }
 
-        if (email) {
-            if (!isValidEmail(email)) {
-                return res.status(400).send({ status: false, message: "Email is not Valid !" })
-            }
+        if (data.hasOwnProperty("email")) {
+            if (!isValid(email)) { return res.status(400).send({ status: false, message: "Please Provide Email" }) }
+            if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email !" })}
+
             let checkEmail = await userModel.findOne({ email: email })
             if (checkEmail) return res.status(400).send({ status: false, message: "Email already exists" })
         }
 
-        if (profileImage) {
+        if (data.hasOwnProperty("profileImage")) {
             if (!isValidName(profileImage)) {
                 return res.status(400).send({ status: false, message: "ProfileImage is missing ! " })
             }
         }
 
-        if (phone) {
+        if (data.hasOwnProperty("phone")) {
+            if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
             if (!isValidMobile(phone)) {
-                return res.status(400).send({ status: false, message: "phone number is missing ! " })
+                return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " })
 
             } let checkPhone = await userModel.findOne({ phone: phone })
             if (checkPhone) return res.status(400).send({ status: false, message: "Phone Number already exists" })
         }
 
-        if (password) {
+        if (data.hasOwnProperty("password")) {
+            if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
             if (!isValidPassword(password)) {
                 return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" })
             }
