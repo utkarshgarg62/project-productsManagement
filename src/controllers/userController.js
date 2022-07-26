@@ -1,8 +1,40 @@
+const jwt = require("jsonwebtoken")
+const aws= require("aws-sdk")
 const userModel = require('../models/userModel')
 const { isValid, isValidObjectId, isValidName, isValidString, isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const jwt = require("jsonwebtoken")
+
+
+//================================================[Upload File Function -AWS]=======================================================================
+
+
+aws.config.update({
+    accessKeyId: "AKIAY3L35MCRVFM24Q7U",
+    secretAccessKey: "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",
+    region: "ap-south-1"
+})
+
+let uploadFile= async ( file) =>{
+   return new Promise( function(resolve, reject) {
+    let s3= new aws.S3({apiVersion: '2006-03-01'}); 
+
+    var uploadParams= {
+        ACL: "public-read",
+        Bucket: "classroom-training-bucket",  
+        Key: "abc/" + file.originalname,  
+        Body: file.buffer
+    }
+
+    s3.upload( uploadParams, function (err, data ){
+        if(err) {
+            return reject({"error": err})
+        }
+        return resolve(data.Location)
+    })
+})
+}
+
 
 //================================================[CREATE API FOR USER]=======================================================================
 
@@ -28,7 +60,11 @@ const createUser = async function (req, res) {
         if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email" }) }
 
 
-        if (!isValid(profileImage)) { return res.status(400).send({ status: false, message: "Please Provide Profile Image" }) }
+        let files=req.files
+        if (!(files&&files.length)) {
+            return res.status(400).send({ status: false, message: "Please Provide Profile Image" });}
+        let uploadedprofileImage = await uploadFile(files[0])
+        data.profileImage=uploadedprofileImage
 
 
         if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
@@ -181,7 +217,7 @@ const updateUser = async function (req, res) {
         let data = req.body
 
         let { fname, lname, email, profileImage, phone, password, address } = data
-        
+
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
         if (data.hasOwnProperty("fname")) {
