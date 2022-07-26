@@ -185,14 +185,10 @@ const updateUser = async function (req, res) {
         if (Object.keys(data).length < 1) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
         if (fname) {
-            // if (!isValidString(fname)) {
-            //     return res.status(400).send({ status: false, message: "FirstName is not Present !" })
-            // }
-            if (fname == null) {
-                return res.status(400).send({ status: false, message: "FirstName is not Present !" })
-            }
-            if (!isValidName(fname)) {
-                return res.status(400).send({ status: false, message: "FirstName is not Valid !" })
+
+            if (data.hasOwnProperty("fname")) {
+                if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
+                if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname" }) }
             }
         }
 
