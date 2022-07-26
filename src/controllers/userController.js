@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
 const aws= require("aws-sdk")
 const userModel = require('../models/userModel')
-const { isValid, isValidObjectId, isValidName, isValidString, isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
+const { isValid, isValidObjectId, isValidName, isValidEmail, isValidMobile, isValidPassword, isValidReqBody, isValidPincode } = require("../middleware/validation")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -46,7 +46,7 @@ const createUser = async function (req, res) {
 
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
-        let { fname, lname, email, profileImage, phone, password, address } = data
+        let { fname, lname, email, phone, password, address } = data
 
         if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
         if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname" }) }
@@ -74,8 +74,8 @@ const createUser = async function (req, res) {
         if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
         if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" }) }
 
-        const hash = bcrypt.hashSync(password, saltRounds);
-        data.password = hash
+        const convertedPassword = bcrypt.hashSync(password, saltRounds);
+        data.password = convertedPassword
 
 
         if (!isValid(address)) { return res.status(400).send({ status: false, message: "Please Provide Address" }) }
@@ -93,6 +93,10 @@ const createUser = async function (req, res) {
                 return res.status(400).send({ status: false, message: "Shipping address's Pincode is Required" })
 
             }
+            if (!isValidPincode(address.shipping.pincode)) {
+                return res.status(400).send({ status: false, message: "Shipping address's Pincode should be 6 digits" })
+            }
+
         } else { return res.status(400).send({ status: false, message: "Shipping address is Required" }) }
 
 
@@ -110,6 +114,10 @@ const createUser = async function (req, res) {
                 return res.status(400).send({ status: false, message: "Billing address's Pincode is Required" })
 
             }
+            if (!isValidPincode(address.billing.pincode)) {
+                return res.status(400).send({ status: false, message: "Billing address's Pincode should be 6 digits" })
+            }
+
         } else { return res.status(400).send({ status: false, message: "Billing address is Required" }) }
 
 
@@ -163,7 +171,10 @@ const loginUser = async function (req, res) {
         }, "project_5")
 
 
-        res.status(200).setHeader("x-api-key", token);
+        // res.status(200).setHeader("x-api-key", token);
+        // res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
+
+        res.header("Authorization", token);
         res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
 
     }
@@ -261,11 +272,6 @@ const updateUser = async function (req, res) {
             data.password = hash
         }
 
-        // if (address) {
-        //     if (!isValidPassword(password)) {
-        //         return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" })
-        //     }
-        // }
 
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
         res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
