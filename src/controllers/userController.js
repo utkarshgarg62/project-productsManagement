@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
-const aws= require("aws-sdk")
+const aws = require("aws-sdk")
 const userModel = require('../models/userModel')
-const { isValid, isValidObjectId, isValidName, isValidString, isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
+const { isValid, isValidObjectId, isValidName, isValidEmail, isValidMobile, isValidPassword, isValidReqBody, isValidPincode } = require("../middleware/validation")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -15,24 +15,24 @@ aws.config.update({
     region: "ap-south-1"
 })
 
-let uploadFile= async ( file) =>{
-   return new Promise( function(resolve, reject) {
-    let s3= new aws.S3({apiVersion: '2006-03-01'}); 
+let uploadFile = async (file) => {
+    return new Promise(function (resolve, reject) {
+        let s3 = new aws.S3({ apiVersion: '2006-03-01' });
 
-    var uploadParams= {
-        ACL: "public-read",
-        Bucket: "classroom-training-bucket",  
-        Key: "abc/" + file.originalname,  
-        Body: file.buffer
-    }
-
-    s3.upload( uploadParams, function (err, data ){
-        if(err) {
-            return reject({"error": err})
+        var uploadParams = {
+            ACL: "public-read",
+            Bucket: "classroom-training-bucket",
+            Key: "abc/" + file.originalname,
+            Body: file.buffer
         }
-        return resolve(data.Location)
+
+        s3.upload(uploadParams, function (err, data) {
+            if (err) {
+                return reject({ "error": err })
+            }
+            return resolve(data.Location)
+        })
     })
-})
 }
 
 
@@ -46,7 +46,7 @@ const createUser = async function (req, res) {
 
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
-        let { fname, lname, email, profileImage, phone, password, address } = data
+        let { fname, lname, email, phone, password, address } = data
 
         if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
         if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname" }) }
@@ -60,11 +60,12 @@ const createUser = async function (req, res) {
         if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email" }) }
 
 
-        let files=req.files
-        if (!(files&&files.length)) {
-            return res.status(400).send({ status: false, message: "Please Provide Profile Image" });}
+        let files = req.files
+        if (!(files && files.length)) {
+            return res.status(400).send({ status: false, message: "Please Provide Profile Image" });
+        }
         let uploadedprofileImage = await uploadFile(files[0])
-        data.profileImage=uploadedprofileImage
+        data.profileImage = uploadedprofileImage
 
 
         if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
@@ -74,8 +75,8 @@ const createUser = async function (req, res) {
         if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
         if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" }) }
 
-        const hash = bcrypt.hashSync(password, saltRounds);
-        data.password = hash
+        const convertedPassword = bcrypt.hashSync(password, saltRounds);
+        data.password = convertedPassword
 
 
         if (!isValid(address)) { return res.status(400).send({ status: false, message: "Please Provide Address" }) }
@@ -93,6 +94,10 @@ const createUser = async function (req, res) {
                 return res.status(400).send({ status: false, message: "Shipping address's Pincode is Required" })
 
             }
+            if (!isValidPincode(address.shipping.pincode)) {
+                return res.status(400).send({ status: false, message: "Shipping address's Pincode should be 6 digits" })
+            }
+
         } else { return res.status(400).send({ status: false, message: "Shipping address is Required" }) }
 
 
@@ -110,6 +115,10 @@ const createUser = async function (req, res) {
                 return res.status(400).send({ status: false, message: "Billing address's Pincode is Required" })
 
             }
+            if (!isValidPincode(address.billing.pincode)) {
+                return res.status(400).send({ status: false, message: "Billing address's Pincode should be 6 digits" })
+            }
+
         } else { return res.status(400).send({ status: false, message: "Billing address is Required" }) }
 
 
@@ -162,9 +171,10 @@ const loginUser = async function (req, res) {
 
         }, "project_5")
 
+
         res.header("Authorization", token);
-        return res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
- 
+        res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
+
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -260,7 +270,6 @@ const updateUser = async function (req, res) {
             data.password = hash
         }
 
-     
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
         res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
 

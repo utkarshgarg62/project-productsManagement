@@ -4,14 +4,7 @@ const mongoose = require("mongoose")
 const isValidReqBody = function (requestBody) {
     return Object.keys(requestBody).length > 0;
 };
- 
 
-
-//String Validation
-const isValidString = function(value){
-    if(typeof value == 'string' && value.trim().length == 0)return false
-    return true
-}
 
 
 //Value Validation
@@ -51,14 +44,21 @@ const isValidObjectId = function (id) {
     return ObjectId.isValid(id)
 }
 
+//Pincode Validation
+const isValidPincode = function (pincode) {
+    const pincodeRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/
+    return pincodeRegex.test(pincode)
+}
+
+
 
 module.exports = {
     isValidReqBody,
     isValid,
     isValidObjectId,
     isValidName,
-    isValidString,
     isValidEmail,
     isValidMobile,
-    isValidPassword
+    isValidPassword,
+    isValidPincode
 }
