@@ -1,8 +1,40 @@
+const jwt = require("jsonwebtoken")
+const aws= require("aws-sdk")
 const userModel = require('../models/userModel')
 const { isValid, isValidObjectId, isValidName, isValidString, isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
-const bcrypt = require('bcrypt');  //<== salt and hash 
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const jwt = require("jsonwebtoken")
+
+
+//================================================[Upload File Function -AWS]=======================================================================
+
+
+aws.config.update({
+    accessKeyId: "AKIAY3L35MCRVFM24Q7U",
+    secretAccessKey: "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",
+    region: "ap-south-1"
+})
+
+let uploadFile= async ( file) =>{
+   return new Promise( function(resolve, reject) {
+    let s3= new aws.S3({apiVersion: '2006-03-01'}); 
+
+    var uploadParams= {
+        ACL: "public-read",
+        Bucket: "classroom-training-bucket",  
+        Key: "abc/" + file.originalname,  
+        Body: file.buffer
+    }
+
+    s3.upload( uploadParams, function (err, data ){
+        if(err) {
+            return reject({"error": err})
+        }
+        return resolve(data.Location)
+    })
+})
+}
+
 
 //================================================[CREATE API FOR USER]=======================================================================
 
@@ -28,7 +60,11 @@ const createUser = async function (req, res) {
         if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email" }) }
 
 
-        if (!isValid(profileImage)) { return res.status(400).send({ status: false, message: "Please Provide Profile Image" }) }
+        let files=req.files
+        if (!(files&&files.length)) {
+            return res.status(400).send({ status: false, message: "Please Provide Profile Image" });}
+        let uploadedprofileImage = await uploadFile(files[0])
+        data.profileImage=uploadedprofileImage
 
 
         if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
@@ -126,10 +162,9 @@ const loginUser = async function (req, res) {
 
         }, "project_5")
 
-
-        res.status(200).setHeader("x-api-key", token);
-        res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
-
+        res.header("Authorization", token);
+        return res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
+ 
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -182,8 +217,7 @@ const updateUser = async function (req, res) {
 
         let { fname, lname, email, profileImage, phone, password, address } = data
 
-        if (Object.keys(data).length < 1) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
-
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
         if (data.hasOwnProperty("fname")) {
             if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
@@ -212,21 +246,17 @@ const updateUser = async function (req, res) {
 
         if (data.hasOwnProperty("phone")) {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
-            if (!isValidMobile(phone)) {
-                return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " })
+            if (!isValidMobile(phone)) { return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " }) }
 
-            } let checkPhone = await userModel.findOne({ phone: phone })
+            let checkPhone = await userModel.findOne({ phone: phone })
             if (checkPhone) return res.status(400).send({ status: false, message: "Phone Number already exists" })
         }
 
         if (data.hasOwnProperty("password")) {
             if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
-            if (!isValidPassword(password)) {
-                return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" })
-            }
+            if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Enter a Valid password 8 min and 15 max !" }) }
 
-
-            const hash = bcrypt.hashSync(password, saltRounds);     
+            const hash = bcrypt.hashSync(password, saltRounds);     // <== 
             data.password = hash
         }
 
