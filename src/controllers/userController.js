@@ -1,5 +1,5 @@
 const userModel = require('../models/userModel')
-const { isValid, isValidObjectId, isValidName, isValidString,isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
+const { isValid, isValidObjectId, isValidName, isValidString, isValidEmail, isValidMobile, isValidPassword, isValidReqBody } = require("../middleware/validation")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require("jsonwebtoken")
@@ -181,10 +181,8 @@ const updateUser = async function (req, res) {
         let data = req.body
 
         let { fname, lname, email, profileImage, phone, password, address } = data
-
-        if (Object.keys(data).length < 1) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
-
-
+        
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
         if (data.hasOwnProperty("fname")) {
             if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
@@ -199,7 +197,7 @@ const updateUser = async function (req, res) {
 
         if (data.hasOwnProperty("email")) {
             if (!isValid(email)) { return res.status(400).send({ status: false, message: "Please Provide Email" }) }
-            if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email !" })}
+            if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email !" }) }
 
             let checkEmail = await userModel.findOne({ email: email })
             if (checkEmail) return res.status(400).send({ status: false, message: "Email already exists" })
@@ -213,18 +211,16 @@ const updateUser = async function (req, res) {
 
         if (data.hasOwnProperty("phone")) {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
-            if (!isValidMobile(phone)) {
-                return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " })
+            if (!isValidMobile(phone)) { return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " }) }
 
-            } let checkPhone = await userModel.findOne({ phone: phone })
+            let checkPhone = await userModel.findOne({ phone: phone })
             if (checkPhone) return res.status(400).send({ status: false, message: "Phone Number already exists" })
         }
 
         if (data.hasOwnProperty("password")) {
             if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
-            if (!isValidPassword(password)) {
-                return res.status(400).send({ status: false, message: "Minimum eight characters, at least 1 letter and 1 number in Password : Min 8 and Max 15" })
-            }
+            if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Enter a Valid password 8 min and 15 max !" }) }
+
             const hash = bcrypt.hashSync(password, saltRounds);     // <== 
             data.password = hash
         }
