@@ -16,7 +16,7 @@ const isValid = function (value) {
 
 //Name Validation
 const isValidName = function (name) {
-    const nameRegex = /^[a-zA-Z]{2,30}$/
+    const nameRegex = /^[a-zA-Z]{1,30}$/
     return nameRegex.test(name)
 }
 
@@ -46,7 +46,7 @@ const isValidObjectId = function (id) {
 
 //Pincode Validation
 const isValidPincode = function (pincode) {
-    const pincodeRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/
+    const pincodeRegex = /^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/
     return pincodeRegex.test(pincode)
 }
 

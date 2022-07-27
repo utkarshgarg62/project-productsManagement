@@ -25,7 +25,7 @@ const productSchema = new mongoose.schema({
     },
 
     currencyFormat: {
-        type: string,
+        type: String,
         required: true,
         // Rupee symbol
     },
@@ -41,7 +41,7 @@ const productSchema = new mongoose.schema({
     },  // s3 link
 
     style: {
-        type: string
+        type: String
     },
 
     availableSizes: {
@@ -58,10 +58,10 @@ const productSchema = new mongoose.schema({
     },
 
     isDeleted: {
-        type: boolean,
+        type: Boolean,
         default: false
     },
 
-}, { timeStamp: true })
+}, { timestamps: true })
 
 module.exports = mongoose.model('productModel', productSchema)

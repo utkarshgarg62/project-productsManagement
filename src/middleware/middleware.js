@@ -4,6 +4,8 @@ const { isValidObjectId } = require("../middleware/validation");
 
 //=====================================================Authentication========================================================================
 
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmUwNDhkN2FjMWViYzZlN2UyYzJjZTUiLCJhdCI6MTY1ODg2NTkwOSwiZXhwIjoxNjU4OTUyMzA5LCJpYXQiOjE2NTg4NjU5MDl9.V52tfjtATQfhkmXtD6MaiGU4x6QORMP0VDNGftw_6nI
+
 const authentication = function (req, res, next) {
     try {
         let token = req.headers["authorization"]
@@ -11,12 +13,12 @@ const authentication = function (req, res, next) {
 
         let token1 = token.split(" ").pop()
 
-        let decodedToken = jwt.verify(token, "project_5", (err, decodedToken) => {
+        let decodedToken = jwt.verify(token1, "project_5", (err, decodedToken) => {
             if (err) {
                 res.status(401).send({ status: false, Error: err.message })
             }
             req.userLoggedIn = decodedToken.userId
-            req.token1 = decoded
+            req.token1 = decodedToken
         })
 
         next()
