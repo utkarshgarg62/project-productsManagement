@@ -5,7 +5,11 @@ const isValidReqBody = function (requestBody) {
     return Object.keys(requestBody).length > 0;
 };
 
-
+//Title Validation
+const isValidTitle =function(title){
+    const  titleRegex =/([a-zA-Z0-9] )/
+    return titleRegex.test(title)
+}
 
 //Value Validation
 const isValid = function (value) {
@@ -50,15 +54,31 @@ const isValidPincode = function (pincode) {
     return pincodeRegex.test(pincode)
 }
 
+//Boolean Validation
+const isBoolean = function(value){
+    if(value === true || value === false) return true
+    return false
+}
+
+//Number (Price) Validation
+const isNumber = function (value){
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === Number && value.trim().length === 0) return false
+}
+
+
 
 
 module.exports = {
     isValidReqBody,
     isValid,
     isValidObjectId,
+    isValidTitle,
     isValidName,
     isValidEmail,
     isValidMobile,
     isValidPassword,
-    isValidPincode
+    isValidPincode,
+    isBoolean,
+    isNumber
 }

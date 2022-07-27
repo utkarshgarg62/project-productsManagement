@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const productSchema = new mongoose.schema({
+const productSchema = new mongoose.Schema({
 
     title: {
         type: String,
@@ -37,7 +37,7 @@ const productSchema = new mongoose.schema({
 
     productImage: {
         type: String,
-        require: true
+        required: true
     },  // s3 link
 
     style: {
@@ -45,7 +45,9 @@ const productSchema = new mongoose.schema({
     },
 
     availableSizes: {
-        type: String,
+        type: [String],
+        required:true,
+        trim:true,
         enum: ["S", "XS", "M", "X", "L", "XXL", "XL"]
     },
 
@@ -55,6 +57,7 @@ const productSchema = new mongoose.schema({
 
     deletedAt: {
         type: Date,
+        default:null
     },
 
     isDeleted: {
