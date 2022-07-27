@@ -4,7 +4,6 @@ const { isValidObjectId } = require("../middleware/validation");
 
 //=====================================================Authentication========================================================================
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmUwNDhkN2FjMWViYzZlN2UyYzJjZTUiLCJhdCI6MTY1ODg2NTkwOSwiZXhwIjoxNjU4OTUyMzA5LCJpYXQiOjE2NTg4NjU5MDl9.V52tfjtATQfhkmXtD6MaiGU4x6QORMP0VDNGftw_6nI
 
 const authentication = function (req, res, next) {
     try {

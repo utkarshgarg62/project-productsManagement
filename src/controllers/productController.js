@@ -1,9 +1,77 @@
-const jwt = require("jsonwebtoken")
-const aws = require("aws-sdk")
-const userModel = require('../models/userModel')
-const { isValid, isValidObjectId, isValidName, isNumber, isValidPrice, isBoolean,  isValidMobile, isValidPassword, isValidReqBody, isValidPincode } = require("../middleware/validation")
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const productModel = require("../models/productModel")
+const { isValidReqBody, isValid, isValidTitle, isValidObjectId, isNumber } = require("../middleware/validation")
+const getSymbolFromCurrency = require('currency-symbol-map')
+
+//================================================[CREATE API FOR PRODUCT]=======================================================================
+
+
+
+const createProducts = async function (req, res) {
+    try {
+        let data = req.body;
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
+
+        let { title, description, price, currencyId, currencyFormat,
+            isFreeShipping, productImage, style, availableSizes, installments,
+            deleteAt, isdDeleted } = data;
+
+        if (!isValid(title)) { return res.status(400).send({ status: false, message: "Please Provide Title" }) }
+        if (!isValidTitle(title)) { return res.status(400).send({ status: false, message: "Enter a Valid Title" }) }
+
+        if (!isValid(description)) { return res.status(400).send({ status: false, message: "Please Provide description" }) }
+
+        if (!isValid(price)) { return res.status(400).send({ status: false, message: "Please Provide price" }) }
+
+        if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currencyId" }) }
+
+        if (!isValid(currencyFormat)) { return res.status(400).send({ status: false, message: "Please Provide currencyFormat" }) }
+        if (!isValid(productImage)) { return res.status(400).send({ status: false, message: "Please Provide productImage" }) }
+        if (!isValid(availableSizes)) { return res.status(400).send({ status: false, message: "Please Provide availableSizes" }) }
+
+        if (!isBoolean(isFreeShipping)) { return res.status(400).send({ status: false, message: "isFreeShipping can only be true/false" }) }
+
+
+
+        let checkTitle = await productModel.findOne({ title: title })
+        if (checkTitle) return res.status(400).send({ status: false, message: "Title already exists" })
+
+
+        let CreatedData = await productModel.create(data)
+        return res.status(201).send({ status: true, message: 'Success', data: CreatedData })
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, message: err })
+    }
+}
+
+
+//================================================[GET API FOR PRODUCT]==================================================================
+
+
+const getProductsById = async function (req, res) {
+    try {
+        let productId = req.params.productId
+        if (!isValidObjectId(productId)) return res.status(400).send({ status: false, message: "Incorrect Product Id format" })
+
+        let data = await productModel.findById({ _id: productId })
+        if (!data) {
+            return res.status(404).send({ status: false, message: "product Id not found" })
+        }
+        if (data.isDeleted == true) {
+            return res.status(400).send({ status: false, message: "data is already deleted" })
+        }
+        else {
+            return res.status(200).send({ status: true, message: "success", data: data })
+        }
+
+    } catch (err) {
+        res.status(500).send({ status: false, error: err.message })
+    }
+}
+
+
+//================================================[UPDATE API FOR PRODUCT]==================================================================
+
 
 
 const updateProduct = async function (req, res) {
@@ -12,7 +80,7 @@ const updateProduct = async function (req, res) {
 
         let data = req.body
 
-        let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments} = data
+        let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments } = data
 
         if (!isValidObjectId(ProductId)) return res.status(400).send({ status: false, message: "Invalid ProductId" })
 
@@ -60,7 +128,11 @@ const updateProduct = async function (req, res) {
 
         // ===============================================================>
         //  <====== ₹
-        // currencyId, currencyFormat, availableSizes <===== this are incompleted
+        // currencyFormat, availableSizes <===== this are incompleted
+
+        if (data.hasOwnProperty("currencyId")) {
+            if (!(currencyId == "INR")) { return res.status(400).send({ status: false, message: "Please Provide 'INR'" }) }
+        }
 
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
         res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
@@ -70,6 +142,13 @@ const updateProduct = async function (req, res) {
         res.status(500).send({ status: false, message: err })
     }
 }
+
+
+
+//================================================[DLETE API FOR PRODUCT]==================================================================
+
+
+
 
 const deleteProduct = async function (req, res) {
 
@@ -91,5 +170,11 @@ const deleteProduct = async function (req, res) {
     }
 }
 
+//================================================[MODULE EXPORTS]==================================================================
+
+
+
 module.exports.updateProduct = updateProduct
 module.exports.deleteProduct = deleteProduct
+module.exports.createProducts = createProducts
+module.exports.getProductsById = getProductsById

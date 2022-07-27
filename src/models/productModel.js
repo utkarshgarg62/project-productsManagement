@@ -37,7 +37,7 @@ const productSchema = new mongoose.Schema({
 
     productImage: {
         type: String,
-        require: true
+        required: true
     },  // s3 link
 
     style: {
@@ -45,7 +45,9 @@ const productSchema = new mongoose.Schema({
     },
 
     availableSizes: {
-        type: String,
+        type: [String],
+        required:true,
+        trim:true,
         enum: ["S", "XS", "M", "X", "L", "XXL", "XL"]
     },
 
@@ -55,6 +57,7 @@ const productSchema = new mongoose.Schema({
 
     deletedAt: {
         type: Date,
+        default:null
     },
 
     isDeleted: {
