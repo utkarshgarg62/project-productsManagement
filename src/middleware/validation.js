@@ -14,6 +14,12 @@ const isValid = function (value) {
     return true
 }
 
+//Number (Price) Validation
+const isNumber = function (value){
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === Number && value.trim().length === 0) return false
+}
+
 //Name Validation
 const isValidName = function (name) {
     const nameRegex = /^[a-zA-Z]{1,30}$/
@@ -49,7 +55,17 @@ const isValidPincode = function (pincode) {
     const pincodeRegex = /^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/
     return pincodeRegex.test(pincode)
 }
+//Pincode Price
+const isValidPrice = function (price) {
+    const priceRegex = /^[1-9]\d{0,6}\.\d{2}$/
+    return priceRegex.test(price)
+}
 
+//Boolean Validation
+const isBoolean = function(value){
+    if(value === true || value === false) return true
+    return false
+}
 
 
 module.exports = {
@@ -60,5 +76,8 @@ module.exports = {
     isValidEmail,
     isValidMobile,
     isValidPassword,
-    isValidPincode
+    isValidPincode,
+    isValidPrice,
+    isNumber,
+    isBoolean
 }

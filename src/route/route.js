@@ -14,8 +14,8 @@ router.put('/user/:userId/profile', middleware.authentication, middleware.author
 // router.post('/products', productController. )
 // router.get('/products', productController. )
 // router.get('/products/:productId', productController. )
-// router.put('/products/:productId', productController.)
-// router.delete('/products/:productId', productController.)
+router.put('/products/:productId', productController.updateProduct)
+router.delete('/products/:productId', productController.deleteProduct)
 
 
 module.exports = router;
