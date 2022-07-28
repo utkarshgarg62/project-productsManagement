@@ -24,6 +24,12 @@ const isValidName = function (name) {
     return nameRegex.test(name)
 }
 
+//Name Validation
+const isValidStyle = function (name) {
+    const nameRegex = /^[a-zA-Z ]{1,30}$/
+    return nameRegex.test(name)
+}
+
 //Email Validation
 const isValidEmail = function (email) {
     const emailRegex = /^[a-z0-9][a-z0-9-_\.]+@([a-z]|[a-z0-9]?[a-z0-9-]+[a-z0-9])\.[a-z0-9]{2,10}(?:\.[a-z]{2,10})?$/
@@ -66,7 +72,11 @@ const isNumber = function (value){
     if (typeof value === Number && value.trim().length === 0) return false
 }
 
-
+//Installment Validation
+const validInstallment = function (value) {
+    const installRegex = /^[0-9]{1,2}$/
+    return installRegex.test(value)
+}
 
 
 module.exports = {
@@ -75,10 +85,12 @@ module.exports = {
     isValidObjectId,
     isValidTitle,
     isValidName,
+    isValidStyle,
     isValidEmail,
     isValidMobile,
     isValidPassword,
     isValidPincode,
     isBoolean,
-    isNumber
+    isNumber,
+    validInstallment
 }
