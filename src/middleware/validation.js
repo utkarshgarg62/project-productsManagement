@@ -50,7 +50,7 @@ const isValidObjectId = function (id) {
 
 //Pincode Validation
 const isValidPincode = function (pincode) {
-    const pincodeRegex = /^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/
+    const pincodeRegex = /^[1-9]{1}?[0-9]{5}$/
     return pincodeRegex.test(pincode)
 }
 
