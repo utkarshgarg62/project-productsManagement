@@ -2,11 +2,14 @@ const productModel = require("../models/productModel")
 const { isValidReqBody, isValid, isValidTitle, isValidObjectId, isNumber } = require("../middleware/validation")
 const getSymbolFromCurrency = require('currency-symbol-map')
 
+const aws = require("aws-sdk")
+
 //================================================[CREATE API FOR PRODUCT]=======================================================================
 
 
 
 const createProducts = async function (req, res) {
+
     try {
         let data = req.body;
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
@@ -77,7 +80,6 @@ const getProductsById = async function (req, res) {
 const updateProduct = async function (req, res) {
     try {
         let ProductId = req.params.productId
-
         let data = req.body
 
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments } = data
@@ -110,32 +112,43 @@ const updateProduct = async function (req, res) {
         }
 
         if (data.hasOwnProperty("productImage")) {
-            if (!isValidName(productImage)) { // <===========================   MUST BE A PROBLEM IN THIS LINE  
+            if (!isValidName(productImage)) { // <=========================== MUST BE A PROBLEM IN THIS LINE in future
                 return res.status(400).send({ status: false, message: "productImage is missing ! " })
             }
         }
 
         if (data.hasOwnProperty("isFreeShipping")) {
-            if (!isBoolean(isFreeShipping)) {  // <=========================== There Must be a problem 
+            if (!isBoolean(isFreeShipping)) {  // <=========================== There Must be a problem in future
                 return res.status(400).send({ status: false, message: "Boolean Value should be present ! " })
             }
         }
 
         if (data.hasOwnProperty("installments")) {
-            if (!isNumber(installments)) { return res.status(400).send({ status: false, message: "Please Provide price" }) }
-            if (!isValidPrice(installments)) { return res.status(400).send({ status: false, message: "Enter a Valid price !" }) }
+            if (!isNumber(installments)) { return res.status(400).send({ status: false, message: "Please Provide EMI Installment" }) }
+            if (!isValidPrice(installments)) { return res.status(400).send({ status: false, message: "Enter a Valid EMI Installment !" }) }
         }
-
-        // ===============================================================>
-        //  <====== ₹
-        // currencyFormat, availableSizes <===== this are incompleted
 
         if (data.hasOwnProperty("currencyId")) {
             if (!(currencyId == "INR")) { return res.status(400).send({ status: false, message: "Please Provide 'INR'" }) }
         }
 
+        if (data.hasOwnProperty("currencyFormat")) {
+            let rupeesSymbol = getSymbolFromCurrency('₹')
+            console.log(rupeesSymbol)
+            if (!rupeesSymbol) { return res.status(400).send({ status: false, message: "Please Provide ₹ Symbol" }) }
+        }
+
+        if (data.hasOwnProperty("availableSizes")) {
+            if (!availableSizes) return res.status(400).send({ status: false, message: "Please enter availableSizes" })
+
+            if (!isValid(availableSizes)) return res.status(400).send({ status: false, message: "Provide valid availableSizes" })
+
+            if (availableSizes != "S" && availableSizes != "M" && availableSizes != "L" && availableSizes != "S" && availableSizes != "X" && availableSizes != "XS" && availableSizes != "XL" && availableSizes != "XXl") 
+            return res.status(400).send({ status: false, message: 'Provide Only  "S", "XS", "M", "X", "L", "XXL", "XL" '})
+        }
+
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
-        res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
+        return res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
 
 
     } catch (err) {
@@ -161,6 +174,7 @@ const deleteProduct = async function (req, res) {
 
         let check = await productModel.findOneAndUpdate(
             { _id: BookId }, { isDeleted: true, deletedAt: date }, { new: true })
+
 
         return res.status(200).send({ status: true, message: "success", data: check })
 

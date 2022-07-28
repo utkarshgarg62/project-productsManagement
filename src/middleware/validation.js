@@ -7,7 +7,7 @@ const isValidReqBody = function (requestBody) {
 
 //Title Validation
 const isValidTitle =function(title){
-    const  titleRegex =/([a-zA-Z0-9] )/
+    const  titleRegex =/^[a-zA-Z0-9_]*$/
     return titleRegex.test(title)
 }
 
@@ -71,7 +71,6 @@ const isNumber = function (value){
     if (typeof value === 'undefined' || value === null) return false
     if (typeof value === Number && value.trim().length === 0) return false
 }
-
 
 
 
