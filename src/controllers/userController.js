@@ -195,6 +195,7 @@ const getUserById = async function (req, res) {
 
 
 const updateUser = async function (req, res) {
+  
     try {
 
         let data = JSON.parse(JSON.stringify(req.body));
@@ -208,7 +209,7 @@ const updateUser = async function (req, res) {
         if (!userProfile) { return res.status(404).send({ status: false, message: "user not found" }) }
 
         
-        let { fname, lname, email, phone, password, address,profileImage } = data
+        let { fname, lname, email, phone, password, address, profileImage } = data
 
         let files=req.profileImage
 

@@ -12,7 +12,7 @@ router.put('/user/:userId/profile', middleware.authentication, middleware.author
 
 // Product APIs
 router.post('/products', productController.createProducts )
-// router.get('/products', productController. )
+router.get('/products', productController.getProduct )
 router.get('/products/:productId', productController.getProductsById )
 router.put('/products/:productId', productController.updateProduct)
 router.delete('/products/:productId', productController.deleteProduct)
