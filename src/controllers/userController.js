@@ -34,6 +34,7 @@ let uploadFile = async (file) => {
         })
     })
 }
+module.exports.uploadFile=uploadFile
 
 
 //================================================[CREATE API FOR USER]=======================================================================
@@ -206,7 +207,20 @@ const updateUser = async function (req, res) {
         let userProfile = await userModel.findById({ _id: userId })
         if (!userProfile) { return res.status(404).send({ status: false, message: "user not found" }) }
 
-        let { fname, lname, email, profileImage, phone, password, address } = data
+        
+        let { fname, lname, email, phone, password, address,profileImage } = data
+
+        let files=req.profileImage
+
+        if (files) {
+            if (isValidReqBody(files)) {
+                if (!(files && files.length > 0)) {
+                    return res.status(400).send({ status: false, message: "please provide profile image" })
+                }
+                var updatedProfileImage = await config.uploadFile(files[0])
+            }
+            userProfile.profileImage=updatedProfileImage
+        }
 
 
         if (isValid(fname)) {
@@ -231,12 +245,7 @@ const updateUser = async function (req, res) {
             userProfile.email=email
         }
 
-        if (isValid(profileImage)) {
-            if (!isValidName(profileImage)) {
-                return res.status(400).send({ status: false, message: "ProfileImage is missing ! " })
-            }
-            userProfile.profileImage=profileImage
-        }
+
 
         if (isValid(phone)) {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
@@ -258,10 +267,11 @@ const updateUser = async function (req, res) {
 
         //Address validation ->
         if (isValid(address)) {
-            let addressToString = JSON.parse(address)
-            let add = JSON.stringify(addressToString)
+            let add = JSON.parse(address)
+            console.log(add)
 
             if (add.shipping) {
+                console.log(add.shipping)
                 if (typeof add.shipping != 'object' || Object.keys(add.shipping).length == 0)
                     return res.status(400).send({ status: false, message: "Shipping address not valid" })
 
@@ -269,17 +279,23 @@ const updateUser = async function (req, res) {
                     if (!isValid(add.shipping.street))
                         return res.status(400).send({ status: false, message: "Shipping address street not valid" })
                     userProfile.address.shipping.street = add.shipping.street
+                    console.log(add.shipping.street);
+
                 } if (add.shipping.city) {
                     if (!isValid(add.shipping.city))
                         return res.status(400).send({ status: false, message: "Shipping address city not valid" })
                     userProfile.address.shipping.city = add.shipping.city
+                    console.log(add.shipping.city);
+
                 } if (add.shipping.pincode) {
                     if (!isValid(add.shipping.pincode) || !isValidPincode(add.shipping.pincode))
                         return res.status(400).send({ status: false, message: "Shipping address pincode not valid" })
                     userProfile.address.shipping.pincode = add.shipping.pincode
+                    console.log(add.shipping.pincode);
                 }
             }
             if (add.billing) {
+                console.log(add.billing)
                 if (typeof add.billing != 'object' || Object.keys(add.billing).length == 0)
                     return res.status(400).send({ status: false, message: "billing address not valid" })
 
@@ -287,18 +303,23 @@ const updateUser = async function (req, res) {
                     if (!isValid(add.billing.street))
                         return res.status(400).send({ status: false, message: "Billing address street not valid" })
                     userProfile.address.billing.street = add.billing.street
+                    console.log(add.billing.street);
+
                 } if (add.billing.city) {
                     if (!isValid(add.billing.city))
                         return res.status(400).send({ status: false, message: "billing address city not valid" })
                     userProfile.address.billing.city = add.billing.city
+                    console.log(add.billing.city);
+
                 } if (add.billing.pincode) {
                     if (!isValid(add.billing.pincode) || !isValidPincode(add.billing.pincode))
                         return res.status(400).send({ status: false, message: "billing pincode invalid" })
                     userProfile.address.billing.pincode = add.billing.pincode
+                    console.log(add.billing.pincode);
+
                 }
             }
         }
-        // userProfile.address=JSON.parse(address)
       
 
 

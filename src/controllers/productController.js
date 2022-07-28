@@ -1,4 +1,5 @@
 const productModel = require("../models/productModel")
+const userController=require("../controllers/userController")
 const { isValidReqBody, isValid, isValidTitle, isValidObjectId, isNumber } = require("../middleware/validation")
 const getSymbolFromCurrency = require('currency-symbol-map')
 
@@ -12,31 +13,40 @@ const createProducts = async function (req, res) {
 
     try {
         let data = req.body;
-        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
-
-        let { title, description, price, currencyId, currencyFormat,
-            isFreeShipping, productImage, style, availableSizes, installments,
-            deleteAt, isdDeleted } = data;
-
-        if (!isValid(title)) { return res.status(400).send({ status: false, message: "Please Provide Title" }) }
-        if (!isValidTitle(title)) { return res.status(400).send({ status: false, message: "Enter a Valid Title" }) }
-
-        if (!isValid(description)) { return res.status(400).send({ status: false, message: "Please Provide description" }) }
-
-        if (!isValid(price)) { return res.status(400).send({ status: false, message: "Please Provide price" }) }
-
-        if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currencyId" }) }
-
-        if (!isValid(currencyFormat)) { return res.status(400).send({ status: false, message: "Please Provide currencyFormat" }) }
-        if (!isValid(productImage)) { return res.status(400).send({ status: false, message: "Please Provide productImage" }) }
-        if (!isValid(availableSizes)) { return res.status(400).send({ status: false, message: "Please Provide availableSizes" }) }
-
-        if (!isBoolean(isFreeShipping)) { return res.status(400).send({ status: false, message: "isFreeShipping can only be true/false" }) }
 
 
+        let files = req.files
+        if (!(files && files.length)) {
+            return res.status(400).send({ status: false, message: "Please Provide Profile Image" });
+        }
+        let uploadedproductImage = await userController.uploadFile(files[0])
+        data.productImage = uploadedproductImage
 
-        let checkTitle = await productModel.findOne({ title: title })
-        if (checkTitle) return res.status(400).send({ status: false, message: "Title already exists" })
+        // if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
+
+        // let { title, description, price, currencyId, currencyFormat,
+        //     isFreeShipping, productImage, style, availableSizes, installments,
+        //     deleteAt, isdDeleted } = data;
+
+        // if (!isValid(title)) { return res.status(400).send({ status: false, message: "Please Provide Title" }) }
+        // if (!isValidTitle(title)) { return res.status(400).send({ status: false, message: "Enter a Valid Title" }) }
+
+        // if (!isValid(description)) { return res.status(400).send({ status: false, message: "Please Provide description" }) }
+
+        // if (!isValid(price)) { return res.status(400).send({ status: false, message: "Please Provide price" }) }
+
+        // if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currencyId" }) }
+
+        // if (!isValid(currencyFormat)) { return res.status(400).send({ status: false, message: "Please Provide currencyFormat" }) }
+        // if (!isValid(productImage)) { return res.status(400).send({ status: false, message: "Please Provide productImage" }) }
+        // if (!isValid(availableSizes)) { return res.status(400).send({ status: false, message: "Please Provide availableSizes" }) }
+
+        // if (!isBoolean(isFreeShipping)) { return res.status(400).send({ status: false, message: "isFreeShipping can only be true/false" }) }
+
+
+
+        // let checkTitle = await productModel.findOne({ title: title })
+        // if (checkTitle) return res.status(400).send({ status: false, message: "Title already exists" })
 
 
         let CreatedData = await productModel.create(data)
