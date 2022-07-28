@@ -6,8 +6,8 @@ const isValidReqBody = function (requestBody) {
 };
 
 //Title Validation
-const isValidTitle =function(title){
-    const  titleRegex =/^[a-zA-Z0-9_]*$/
+const isValidTitle =function(title){  // <=========== PERFECT for alpha numeric && capital value
+    const  titleRegex = /^[a-zA-Z\d\-_\s]+$/
     return titleRegex.test(title)
 }
 
@@ -17,7 +17,6 @@ const isValid = function (value) {
     if (typeof value === 'string' && value.trim().length === 0) return false
     return true
 }
-
 
 //Name Validation
 const isValidName = function (name) {
@@ -56,7 +55,7 @@ const isValidPincode = function (pincode) {
 }
 //Pincode Price
 const isValidPrice = function (price) {
-    const priceRegex = /^[1-9]\d{0,6}\.\d{2}$/
+    const priceRegex = /^[1-9]\d{0,6}\.\d{1}$/
     return priceRegex.test(price)
 }
 
@@ -71,7 +70,6 @@ const isNumber = function (value){
     if (typeof value === 'undefined' || value === null) return false
     if (typeof value === Number && value.trim().length === 0) return false
 }
-
 
 
 module.exports = {
