@@ -7,7 +7,7 @@ const isValidReqBody = function (requestBody) {
 
 //Title Validation
 const isValidTitle =function(title){
-    const  titleRegex =/([a-zA-Z0-9] )/
+    const  titleRegex =/[a-zA-Z0-9 ]/
     return titleRegex.test(title)
 }
 
