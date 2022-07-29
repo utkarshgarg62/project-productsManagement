@@ -268,13 +268,11 @@ const updateUser = async function (req, res) {
 
         //Address validation ->
         if (isValid(address)) {
-            console.log(address)
-            let add = JSON.parse(address)
-            console.log(add)
+            let add = JSON.parse(data.address)
+            data.address=add
 
 
             if (add.shipping) {
-                // console.log(add.shipping)
                 if (typeof add.shipping != 'object' || Object.keys(add.shipping).length == 0)
                     return res.status(400).send({ status: false, message: "Shipping address not valid" })
 
@@ -282,24 +280,19 @@ const updateUser = async function (req, res) {
                     if (!isValid(add.shipping.street))
                         return res.status(400).send({ status: false, message: "Shipping address street not valid" })
                     userProfile.address.shipping.street = add.shipping.street
-                    // console.log(add.shipping.street);
 
-                }
-                if (add.shipping.city) {
+                }if (add.shipping.city) {
                     if (!isValid(add.shipping.city))
                         return res.status(400).send({ status: false, message: "Shipping address city not valid" })
                     userProfile.address.shipping.city = add.shipping.city
-                    // console.log(add.shipping.city);
 
                 } if (add.shipping.pincode) {
                     if (!isValid(add.shipping.pincode) || !isValidPincode(add.shipping.pincode))
                         return res.status(400).send({ status: false, message: "Shipping address pincode not valid" })
                     userProfile.address.shipping.pincode = add.shipping.pincode
-                    // console.log(add.shipping.pincode);
                 }
             }
             if (add.billing) {
-                // console.log(add.billing)
                 if (typeof add.billing != 'object' || Object.keys(add.billing).length == 0)
                     return res.status(400).send({ status: false, message: "billing address not valid" })
 
@@ -307,19 +300,16 @@ const updateUser = async function (req, res) {
                     if (!isValid(add.billing.street))
                         return res.status(400).send({ status: false, message: "Billing address street not valid" })
                     userProfile.address.billing.street = add.billing.street
-                    // console.log(add.billing.street);
 
                 } if (add.billing.city) {
                     if (!isValid(add.billing.city))
                         return res.status(400).send({ status: false, message: "billing address city not valid" })
                     userProfile.address.billing.city = add.billing.city
-                    // console.log(add.billing.city);
 
                 } if (add.billing.pincode) {
                     if (!isValid(add.billing.pincode) || !isValidPincode(add.billing.pincode))
                         return res.status(400).send({ status: false, message: "billing pincode invalid" })
                     userProfile.address.billing.pincode = add.billing.pincode
-                    // console.log(add.billing.pincode);
 
                 }
             }
@@ -327,9 +317,9 @@ const updateUser = async function (req, res) {
 
 
 
+
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
         res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
-        // console.log(Updatedata)
     }
     catch (err) {
         res.status(500).send({ status: false, message: err.message })
