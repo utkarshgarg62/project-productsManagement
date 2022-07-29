@@ -6,14 +6,14 @@ const isValidReqBody = function (requestBody) {
 };
 
 //Title Validation
-const isValidTitle =function(title){  // <=========== PERFECT for alpha numeric && capital value
-    const  titleRegex = /^[a-zA-Z\d\-_\s]+$/
+const isValidTitle =function(title){
+    const  titleRegex =/[a-zA-Z0-9 ]/
     return titleRegex.test(title)
 }
 
 //Value Validation
 const isValid = function (value) {
-    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === 'undefined' || value === 'null' ) return false
     if (typeof value === 'string' && value.trim().length === 0) return false
     return true
 }
