@@ -16,7 +16,7 @@ const createProducts = async function (req, res) {
         //*************************** [DESTRUCTURING DATA] ********************/
 
         let { title, description, price, currencyId, currencyFormat,
-            isFreeShipping, style, availableSizes, installments } = data;
+            isFreeShipping, style, installments } = data;
 
         //*************************** [CHECKING VALIDATION OF REQUIRED :TRUE] ********************/
 
@@ -26,7 +26,7 @@ const createProducts = async function (req, res) {
         if (!isValid(price)) { return res.status(400).send({ status: false, message: "Please Provide price" }) }
         if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currencyId" }) }
         if (!isValid(currencyFormat)) { return res.status(400).send({ status: false, message: "Please Provide currencyFormat" }) }
-        if (!isValid(availableSizes)) { return res.status(400).send({ status: false, message: "Please Provide availableSizes" }) }
+        // if (!isValid(availableSizes)) { return res.status(400).send({ status: false, message: "Please Provide availableSizes" }) }
 
         //*************************** [Style Validation] ********************/
 
@@ -69,50 +69,22 @@ const createProducts = async function (req, res) {
         }
 
         //*************************** [Available Sizes Validation] ************/
+        
 
-        // if (availableSizes) {
-        //     let sizesArray = availableSizes.split(",").map(x => x.trim())
+        let availableSizes = req.body.availableSizes.split(",").map(x => x.trim())
 
-        //     for (let i = 0; i < sizesArray.length; i++) {
-        //         if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(sizesArray[i]))) {
-        //             return res.status(400).send({ status: false, message: "AvailableSizes should be among ['S','XS','M','X','L','XXL','XL']" })
-        //         }
-        //     }
+        for (let i = 0; i < availableSizes.length; i++) {
 
-        //     //using array.isArray function to check the value is array or not.
-        //     if (Array.isArray(sizesArray)) {
-        //         newProductData['availableSizes'] = [...new Set(sizesArray)]
-        //     }
-        // }
+            if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(availableSizes[i]))) {
+                console.log(availableSizes[i])
+                return res.status(400).send({ status: false, message: "Size should be among ['S','XS','M','X','L','XXL','XL'] only!" })
+            }
 
-        // if (availableSizes) {
-        //     let validSizes = ["S", "XS", "M", "X", "L", "XXL", "XL"]
-        //     var InputSizes = availableSizes.toUpperCase().split(",").map((s) => s.trim())
-        //     for (let i = 0; i < InputSizes.length; i++) {
-        //         if (!validSizes.includes(InputSizes[i])) {
-        //             return res.status(400).send({ status: false, message: "availableSizes must be [S, XS, M, X, L, XXL, XL]" });
-        //         }
-        //     }
-        // }
-
-        // if (availableSizes) {
-        // let size = ["S", "XS", "M", "X", "L", "XXL", "XL"];
-        // if (!size.includes(availableSizes))
-        //     return res.status(400).send({
-        //         status: false,
-        //         msg: "Invalid size,select from 'S','XS',M','X','L','XXL','XL'",
-        //     });
-        // }
-
-        // if (availableSizes) {
-        //     let sizesArray = availableSizes.split(",").map(x => x.trim())
-
-        //     for (let i = 0; i < sizesArray.length; i++) {
-        //         if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(sizesArray[i]))) {
-        //             return res.status(400).send({ status: false, message: "AvailableSizes should be among ['S','XS','M','X','L','XXL','XL']" })
-        //         }
-        //     }
-        // }
+            if (availableSizes.indexOf(availableSizes[i]) != i) {
+                return res.status(400).send({ status: false, message: "Size not present!" })
+            }
+        }
+        data.availableSizes = availableSizes
 
         //*************************** [isFreeShipping Validation] ************/
 
