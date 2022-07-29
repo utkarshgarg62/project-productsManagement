@@ -241,7 +241,7 @@ const updateProduct = async function (req, res) {
 
         if (files) {
             if (isValidReqBody(files)) {
-                if (!(files && files.length > 0)) {
+                if (!(files && files.length > 0 || files == "")) {
                     return res.status(400).send({ status: false, message: "please provide product image" })
                 }
                 var updatedProductImage = await config.uploadFile(files[0])
@@ -317,8 +317,8 @@ const updateProduct = async function (req, res) {
         if (currencyFormat || currencyFormat == "") {
 
             if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currency id" }) }
-            let rupeesSymbol = getSymbolFromCurrency('₹')
-            if (!rupeesSymbol) { return res.status(400).send({ status: false, message: "Please Provide ₹ Symbol" }) }
+            if (currencyFormat !== "₹") { return res.status(400).send({ status: false, message: "Please Provide ₹" }) }
+            // if (!rupeesSymbol) { return res.status(400).send({ status: false, message: "Please Provide ₹ Symbol" }) }
         }
 
 
@@ -373,7 +373,7 @@ const deleteProduct = async function (req, res) {
         if (!Product) { return res.status(404).send({ status: false, message: "Product not exist in DB" }) }
 
         //checking already deleted data
-        if (Product.isDeleted == true) return res.status(404).send({ status: false, message: "Data is Already deleted" });
+        if (Product.isDeleted == true) return res.status(404).send({ status: false, message: "Product is Already deleted" });
 
 
         await productModel.findOneAndUpdate({ _id: ProductId }, { isDeleted: true, deletedAt: date }, { new: true })
