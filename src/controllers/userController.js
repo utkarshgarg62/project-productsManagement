@@ -61,6 +61,7 @@ const createUser = async function (req, res) {
         data.password = convertedPassword
 
         //Address Validation
+        if (!isValid(address)) { return res.status(400).send({ status: false, message: "Please Provide Address" }) }
         let add = JSON.parse(address)
         if (!isValid(add.shipping))
             return res.status(400).send({ status: false, message: "shipping address required" });
@@ -135,11 +136,11 @@ const loginUser = async function (req, res) {
 
 
         res.header("Authorization", token);
-        return res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
+        res.status(200).send({ status: true, message: 'Success', data: { userId, token } });
 
     }
     catch (err) {
-        return res.status(500).send({ status: false, message: err.message })
+        res.status(500).send({ status: false, message: err.message })
     }
 }
 
@@ -161,7 +162,7 @@ const getUserById = async function (req, res) {
 
         if (!userData) return res.status(404).send({ status: false, message: "User not found " })
 
-        return res.status(200).send({ status: true, message: "user profile details", data: userData })
+        res.status(200).send({ status: true, message: "user profile details", data: userData })
 
     }
     catch (err) {
@@ -179,6 +180,7 @@ const updateUser = async function (req, res) {
   
     try {
 
+
         let data = req.body;
         if (!isValidReqBody(data)) return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" });
 
@@ -192,7 +194,7 @@ const updateUser = async function (req, res) {
 
         let { fname, lname, email, phone, password, address, profileImage } = data
 
-        let files = req.profileImage
+        let files = req.files
 
         if (files) {
             if (isValidReqBody(files)) {
@@ -200,25 +202,25 @@ const updateUser = async function (req, res) {
                     return res.status(400).send({ status: false, message: "please provide profile image" })
                 }
                 var updatedProfileImage = await aws.uploadFile(files[0])
+                // console.log(updatedProfileImage)
             }
-            userProfile.profileImage = updatedProfileImage
+            data.profileImage = updatedProfileImage
         }
 
-
-        if (isValid(fname)) {
+        if (isValid(fname) || fname =="" ) {
             if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
             if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname !" }) }
             userProfile.fname = fname
         }
 
 
-        if (isValid(lname)) {
+        if (isValid(lname) || lname =="" ) {
             if (!isValid(lname)) { return res.status(400).send({ status: false, message: "Please Provide Last Name" }) }
             if (!isValidName(lname)) { return res.status(400).send({ status: false, message: "Enter a Valid Lname !" }) }
             userProfile.lname = lname
         }
 
-        if (isValid(email)) {
+        if (isValid(email) || email =="" ) {
             if (!isValid(email)) { return res.status(400).send({ status: false, message: "Please Provide Email" }) }
             if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email !" }) }
 
@@ -229,7 +231,7 @@ const updateUser = async function (req, res) {
 
 
 
-        if (isValid(phone)) {
+        if (isValid(phone) || phone =="" ) {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
             if (!isValidMobile(phone)) { return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " }) }
 
@@ -238,12 +240,12 @@ const updateUser = async function (req, res) {
             userProfile.phone = phone
         }
 
-        if (isValid(password)) {
+        if (isValid(password) || password =="" ) {
             if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
             if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Enter a Valid password 8 min and 15 max !" }) }
 
-            const hashedPass = bcrypt.hashSync(password, saltRounds);     // <== 
-            userProfile.password = hashedPass
+            const hashedPass = bcrypt.hashSync(data.password, saltRounds);     // <== 
+            data.password = hashedPass
         }
 
 
