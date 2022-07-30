@@ -1,4 +1,3 @@
-
 const aws = require("aws-sdk")
 const mongoose = require("mongoose")
 const productModel = require("../models/productModel")
