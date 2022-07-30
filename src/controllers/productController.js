@@ -355,7 +355,7 @@ const updateProduct = async function (req, res) {
 
 
     } catch (err) {
-        res.status(500).send({ status: false, message: err })
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 
@@ -373,14 +373,15 @@ const deleteProduct = async function (req, res) {
         if (!Product) { return res.status(404).send({ status: false, message: "Product not exist in DB" }) }
 
         //checking already deleted data
-        if (Product.isDeleted == true) return res.status(404).send({ status: false, message: "Product is Already deleted" });
+        if (Product.isDeleted == true)
+            return res.status(404).send({ status: false, message: "Product is Already deleted" });
 
 
         await productModel.findOneAndUpdate({ _id: ProductId }, { isDeleted: true, deletedAt: date }, { new: true })
         return res.status(200).send({ status: true, message: "success", data: "Deleted Data" })
 
     } catch (err) {
-        res.status(500).send({ status: false, message: err })
+        return res.status(500).send({ status: false, message: err.message })
     }
 
 }
