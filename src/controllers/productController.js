@@ -92,7 +92,7 @@ const createProducts = async function (req, res) {
         for (let i = 0; i < availableSizes.length; i++) {
 
             if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(availableSizes[i]))) {
-                console.log(availableSizes[i])
+                // console.log(availableSizes[i])
                 return res.status(400).send({ status: false, message: "Size should be among ['S','XS','M','X','L','XXL','XL'] only!" })
             }
 
@@ -123,10 +123,10 @@ const createProducts = async function (req, res) {
         //*************************** [Creating Data] ***********************/
 
         let CreatedData = await productModel.create(data)
-        return res.status(201).send({ status: true, message: 'Success', data: CreatedData })
+        res.status(201).send({ status: true, message: 'Success', data: CreatedData })
     }
     catch (err) {
-        return res.status(500).send({ status: false, message: err })
+        res.status(500).send({ status: false, message: err })
     }
 }
 
