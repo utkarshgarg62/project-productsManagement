@@ -1,40 +1,21 @@
-const jwt = require("jsonwebtoken")
-const aws = require("aws-sdk")
 const userModel = require('../models/userModel')
-const { isValid, isValidObjectId, isValidName, isValidEmail, isValidMobile, isValidPassword, isValidReqBody, isValidPincode } = require("../middleware/validation")
+const aws=require("../aws/aws_config")
+const jwt = require("jsonwebtoken")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+const { 
+    isValid, 
+    isValidObjectId, 
+    isValidName, 
+    isValidEmail, 
+    isValidMobile, 
+    isValidPassword, 
+    isValidReqBody, 
+    isValidPincode 
+} = require("../middleware/validation")
 
-//================================================[Upload File Function -AWS]=======================================================================
 
-
-aws.config.update({
-    accessKeyId: "AKIAY3L35MCRVFM24Q7U",
-    secretAccessKey: "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",
-    region: "ap-south-1"
-})
-
-let uploadFile = async (file) => {
-    return new Promise(function (resolve, reject) {
-        let s3 = new aws.S3({ apiVersion: '2006-03-01' });
-
-        var uploadParams = {
-            ACL: "public-read",
-            Bucket: "classroom-training-bucket",
-            Key: "abc/" + file.originalname,
-            Body: file.buffer
-        }
-
-        s3.upload(uploadParams, function (err, data) {
-            if (err) {
-                return reject({ "error": err })
-            }
-            return resolve(data.Location)
-        })
-    })
-}
-module.exports.uploadFile = uploadFile
 
 
 //================================================[CREATE API FOR USER]=======================================================================
@@ -65,7 +46,7 @@ const createUser = async function (req, res) {
         if (!(files && files.length)) {
             return res.status(400).send({ status: false, message: "Please Provide Profile Image" });
         }
-        let uploadedprofileImage = await uploadFile(files[0])
+        let uploadedprofileImage = await aws.uploadFile(files[0])
         data.profileImage = uploadedprofileImage
 
 
@@ -218,7 +199,7 @@ const updateUser = async function (req, res) {
                 if (!(files && files.length > 0)) {
                     return res.status(400).send({ status: false, message: "please provide profile image" })
                 }
-                var updatedProfileImage = await config.uploadFile(files[0])
+                var updatedProfileImage = await aws.uploadFile(files[0])
             }
             userProfile.profileImage = updatedProfileImage
         }

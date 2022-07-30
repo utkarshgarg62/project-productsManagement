@@ -1,8 +1,6 @@
-const aws = require("aws-sdk")
-const mongoose = require("mongoose")
 const productModel = require("../models/productModel")
-const getSymbolFromCurrency = require('currency-symbol-map')
-const userController = require("../controllers/userController")
+const aws=require("../aws/aws_config")
+
 const {
     isValidReqBody,
     isValid,
@@ -116,7 +114,7 @@ const createProducts = async function (req, res) {
         if (!(files && files.length > 0)) {
             return res.status(400).send({ status: false, message: "Please Provide Profile Image" });
         }
-        let uploadedproductImage = await userController.uploadFile(files[0])
+        let uploadedproductImage = await aws.uploadFile(files[0])
         data.productImage = uploadedproductImage
 
         //*************************** [Creating Data] ***********************/
