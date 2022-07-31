@@ -6,12 +6,18 @@ const orderModel = require("../models/orderModel")
 
 const createOrder = async function (req, res) {
     try {
+        let userId =req.params.userId
+        let data =req.body
+        let dataToBeAdded = {
+            userId:userId,
 
 
+        }
+        let createdOrder = await orderModel .create(dataToBeAdded)
+        res.status(201).send({status: true, message: 'Success', data: createdOrder })
     }
-    catch {
-
-
+    catch(err) {
+        res.status(500).send({status: false, message:err })
     }
 }
 
@@ -20,12 +26,18 @@ const createOrder = async function (req, res) {
 
 const updateOrder = async function (req, res) {
     try {
+        let userId =req.params.userId
+        let data =req.body
+        let dataToBeUpdated = {
+            userId:userId,
 
 
+        }
+        let updatedOrder = await orderModel .findByIdAndUpdate({_id:userId},dataToBeUpdated,{new:true})
+        res.status(200).send({status: true, message: 'Success', data: updatedOrder })
     }
-    catch {
-
-
+    catch(err) {
+        res.status(500).send({status: false, message:err })
     }
 }
 
