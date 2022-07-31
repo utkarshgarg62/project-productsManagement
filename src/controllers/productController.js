@@ -26,10 +26,9 @@ const createProducts = async function (req, res) {
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
 
-        //*************************** [DESTRUCTURING DATA] ********************/
+        //*************************** [DESTRUCTURINGP DATA] ********************/
 
-        let { title, description, price, currencyId, currencyFormat,
-            isFreeShipping, style, installments } = data;
+        let { title, description, price, currencyId, currencyFormat,isFreeShipping, style, installments } = data;
 
         //*************************** [CHECKING VALIDATION OF REQUIRED :TRUE] ********************/
 
