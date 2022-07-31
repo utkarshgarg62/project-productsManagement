@@ -1,5 +1,5 @@
 const productModel = require("../models/productModel")
-const aws=require("../aws/aws_config")
+const aws = require("../aws/aws_config")
 
 const {
     isValidReqBody,
@@ -134,56 +134,44 @@ const getProduct = async function (req, res) {
     try {
         let filter = req.query;
         let query = { isDeleted: false };
+
+
         if (filter) {
-            const { name, description, isFreeShipping, style, size, installments } = filter;
+            const { name, size, priceGreaterThan, priceLessThan } = filter;
 
-            if (name) {
-                if (!isValidString(name)) return res.status(400).send({ status: false, message: "name  must be alphabetic characters" })
-                query.title = name;
-            }
-            if (description) {
-                if (!isValidString(description)) return res.status(400).send({ status: false, message: "description  must be alphabetic characters" })
-                query.description = description.trim();
+            //*************************** [Filtering By Size] ***********************/
 
+            if(isValid(size)){
+                if(!isValid(size)){ return res.status(400).send({status : false, message : "Enter size"})}   
+                query['availableSizes'] = size.toUpperCase()
             }
-            if (isFreeShipping) {
-                if (!((isFreeShipping === 'true') || (isFreeShipping === 'false'))) {
-                    return res.status(400).send({ status: false, massage: 'isFreeShipping should be a boolean value' })
-                }
-                query.isFreeShipping = isFreeShipping;
-            }
-            if (style) {
-                if (!isValidString(style)) return res.status(400).send({ status: false, message: "style  must be alphabetic characters" })
-                query.style = style.trim();
-            }
-            if (installments) {
-                if (!/^[0-9]+$/.test(installments)) return res.status(400).send({ status: false, message: "installments must be in numeric" })
 
-                query.installments = installments;
+            //*************************** [Filtering By Name] ***********************/
+
+
+            if (isValid(name)) {
+                query['title'] = name;
             }
-            if (size) {
-                let sizes = size.split(/[\s,]+/)
-                let arr = ["S", "XS", "M", "X", "L", "XXL", "XL"]
-                console.log(sizes)
-                for (let i = 0; i < sizes.length; i++) {
-                    if (arr.indexOf(sizes[i]) == -1)
-                        return res.status(400).send({ status: false, message: "availabe sizes must be (S, XS,M,X, L,XXL, XL)" })
-                }
-                const sizeArr = size
-                    .trim()
-                    .split(",")
-                    .map((x) => x.trim());
-                query.availableSizes = { $all: sizeArr };
+
+            //*************************** [Filtering By Price Greater Than] ***********************/
+
+            if(isValid(priceGreaterThan)){
+                if(!isValid(priceGreaterThan)){ return res.status(400).send({status : false, messsage : "Enter value for priceGreaterThan field"}) }
+                query['price'] = { '$gt' : priceGreaterThan}
             }
-        }
-        if (filter.priceLessThan) {
-            if (!/^[0-9 .]+$/.test(filter.priceLessThan)) return res.status(400).send({ status: false, message: "priceLessThan must be in numeric" })
-        }
-        if (filter.priceGreaterThan) {
-            if (!/^[0-9 .]+$/.test(filter.priceGreaterThan)) return res.status(400).send({ status: false, message: "priceGreaterThan must be in numeric" })
+     
+
+            //*************************** [Filtering By Price less Than] ***********************/
+
+            if(isValid(priceLessThan)){
+                if(!isValid(priceLessThan)){ return res.status(400).send({status : false, messsage : "Enter value for priceLessThan"}) }
+                query['price'] = { '$lt' : priceLessThan}
+            }
+
+
         }
 
-        let data = await productModel.find({ ...query }).sort("price");
+        let data = await productModel.find(query).sort({ price: 1 });
 
         if (data.length == 0) {
             return res.status(400).send({ status: false, message: "NO data found" });
@@ -314,7 +302,6 @@ const updateProduct = async function (req, res) {
 
             if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currency id" }) }
             if (currencyFormat !== "₹") { return res.status(400).send({ status: false, message: "Please Provide ₹" }) }
-            // if (!rupeesSymbol) { return res.status(400).send({ status: false, message: "Please Provide ₹ Symbol" }) }
         }
 
 
