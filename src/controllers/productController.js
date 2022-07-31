@@ -315,7 +315,6 @@ const updateProduct = async function (req, res) {
 
             if (!isValid(currencyId)) { return res.status(400).send({ status: false, message: "Please Provide currency id" }) }
             if (currencyFormat !== "₹") { return res.status(400).send({ status: false, message: "Please Provide ₹" }) }
-            // if (!rupeesSymbol) { return res.status(400).send({ status: false, message: "Please Provide ₹ Symbol" }) }
         }
 
 
