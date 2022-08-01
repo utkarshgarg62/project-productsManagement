@@ -20,7 +20,7 @@ router.put('/products/:productId', productController.updateProduct)
 router.delete('/products/:productId', productController.deleteProduct)
 
 // Cart APIs
-router.post('/users/:userId/cart',middleware.authentication, middleware.authorization, cartController.addToCart )
+router.post('/users/:userId/cart', cartController.addToCart )
 router.put('/users/:userId/cart', cartController.updateCart)
 router.get('/users/:userId/cart',middleware.authentication, middleware.authorization, cartController.getCart )
 router.delete('/users/:userId/cart', cartController.deleteCart)
