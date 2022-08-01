@@ -16,6 +16,8 @@ const addToCart = async function (req, res) {
         let data = req.body
 
         let { productId, quantity } = data
+        if(!isValidObjectId(productId)){return res.status(404).send({ status: false, message: "Invalid ProductId" })}
+        // if(!NaN(quantity)){return res.status(404).send({ status: false, message: "Enter A Valid Quantity" })}
 
         let checkProduct = await productModel .findOne({_id:productId,isDeleted:false})
         if(!checkProduct){ return res.status(404).send({ status: false, message: "Product Do Not Exits or DELETED" }) }
@@ -50,11 +52,13 @@ const addToCart = async function (req, res) {
                 quantity:quantity
             }
             arr2.push(productAdded)
+            let totalPriceUpdated = checkCartExitsForUserId.totalPrice + (checkProduct.price * products.quantity)
+            let totalItemsUpdated = checkCartExitsForUserId.totalItems + 1
 
             let dataToBeAdded = {
                 items: arr2,
-                totalPrice: totalPriceCalculated,
-                totalItems: 1
+                totalPrice: totalPriceUpdated,
+                totalItems: totalItemsUpdated
             }
             let updatedData = await cartModel.findOneAndUpdate({ userId: userIdInPath },
                 dataToBeAdded,
