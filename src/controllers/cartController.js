@@ -1,25 +1,7 @@
 const cartModel = require("../models/cartModel")
-const userModel = require('../models/userModel')
+const userModel = require("../models/userModel")
 const productModel = require("../models/productModel")
-const aws = require("../aws/aws_config")
-const jwt = require("jsonwebtoken")
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-
-const {
-    isValidReqBody,
-    isValid,
-    isValidObjectId,
-    isValidTitle,
-    isValidName,
-    isValidPrice,
-    isBoolean,
-    isNumber,
-    isValidEmail,
-    isValidMobile,
-    isValidPassword,
-    isValidPincode
-} = require("../middleware/validation")
+const { isValidObjectId, isValidReqBody, } = require("../middleware/validation")
 
 
 //================================================[ADD TO CART API]=======================================================================
@@ -27,10 +9,39 @@ const {
 
 const addToCart = async function (req, res) {
     try {
+        let userIdInPath = req.params.userId
+        let checkUserId = await userModel.findById({ _id: userIdInPath })
+        if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
 
+        let data = req.body
+        let { userId, items, totalPrice, totalItems } = data
+        console.log(userIdInPath)
 
-
-    } catch (err) {
+        let checkCartExitsForUserId = await cartModel.findOne({ userId: userIdInPath })
+        if (!checkCartExitsForUserId) {
+            let dataToBeCreated = {
+                userId: userIdInPath,
+                items: items,
+                totalPrice: totalPrice,
+                totalItems: totalItems
+            }
+            let createdData = await cartModel.create(dataToBeCreated)
+            return res.status(201).send({ status: true, message: "Success", data: createdData })
+        }
+        else {
+            let dataToBeAdded = {
+                items: items,
+                totalPrice: totalPrice,
+                totalItems: totalItems
+            }
+            let updatedData = await cartModel.findOneAndUpdate({ userId: userIdInPath },
+                dataToBeAdded,
+                { new: true }
+            )
+            return res.status(201).send({ status: true, message: "Successfully Added", data: updatedData })
+        }
+    }
+    catch (err) {
         res.status(500).send({ status: false, message: err })
     }
 }
@@ -70,13 +81,12 @@ const updateCart = async function (req, res) {
         if (!cartNotFound) { return res.status(404).send({ status: false, message: "Cart not exist" }) }
 
 
-
-
         let updatedCart = await cartModel.findByIdAndUpdate({ _id: userId }, data, { new: true })
         return res.status(200).send({ status: true, message: 'Success', data: updatedCart })
 
 
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).send({ status: false, message: err })
     }
 }
@@ -87,12 +97,17 @@ const updateCart = async function (req, res) {
 
 const getCart = async function (req, res) {
     try {
+        let userId = req.params.userId
+        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Incorrect user Id format" })
 
-
+        let cartData = await cartModel.findOne({ userId: userId })
+        if (!cartData) {
+            return res.status(400).send({ status: false, message: "this user has no cart" })
+        }
+        res.status(200).send({ status: true, data: cartData })
     }
-    catch {
-
-
+    catch (err) {
+        res.status(500).send({ status: false, message: err })
     }
 }
 
@@ -101,27 +116,27 @@ const getCart = async function (req, res) {
 
 
 const deleteCart = async function (req, res) {
-    
+    try {
+        let userId = req.params.userId
 
-    // try {
-    //     let cartId = req.params.cartId
-    //     let date = new Date()
+        //check if the document is found with that user id 
+        let checkUser = await userModel.findById(userId)
+        if (!checkUser) { return res.status(400).send({ status: false, msg: "user not found" }) }
 
-    //     let Cart = await cartModel.findOne({ _id: cartId })
-    //     if (!Cart) { return res.status(404).send({ status: false, message: "cart not exist" }) }
-
-    //     //checking is cart already deleted 
-    //     if (Cart.isDeleted == true)
-    //         return res.status(404).send({ status: false, message: "cart is Already deleted" });
-
-    //     await cartModel.findOneAndUpdate({ _id: cartId }, { isDeleted: true, deletedAt: date }, { new: true })
-    //     return res.status(200).send({ status: true, message: "success", data: "Cart is Deleted" })
+        let Cart = await cartModel.findOne({ userId: userId })
+        if (!Cart) {
+            return res.status(404).send({ status: false, msg: "cart not exists" })
+        }
+        const items = []
+        let cartDeleted = await cartModel.findOneAndUpdate({ userId: userId },
+            { $set: { items: items, totalItems: 0, totalPrice: 0 } }, { new: true })
 
 
-    // } catch (err) {
-    //     return res.status(500).send({ status: false, message: err.message })
-    // }
-
+        return res.status(200).send({ status: true, data: cartDeleted })
+    }
+    catch (err) {
+        res.status(500).send({ status: false, message: err })
+    }
 }
 
 
