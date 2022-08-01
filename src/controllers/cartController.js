@@ -80,8 +80,6 @@ const updateCart = async function (req, res) {
         if (!cartNotFound) { return res.status(404).send({ status: false, message: "Cart not exist" }) }
 
 
-
-
         let updatedCart = await cartModel.findByIdAndUpdate({ _id: userId }, data, { new: true })
         return res.status(200).send({ status: true, message: 'Success', data: updatedCart })
 
@@ -118,12 +116,25 @@ const getCart = async function (req, res) {
 
 const deleteCart = async function (req, res) {
     try {
+        let userId = req.params.userId
+
+        //check if the document is found with that user id 
+        let checkUser = await userModel.findById(userId)
+        if (!checkUser) { return res.status(400).send({ status: false, msg: "user not found" }) }
+
+        let Cart = await cartModel.findOne({ userId: userId })
+        if (!Cart) {
+            return res.status(404).send({ status: false, msg: "cart not exists" })
+        }
+        const items = []
+        let cartDeleted = await cartModel.findOneAndUpdate({ userId: userId },
+            { $set: { items: items, totalItems: 0, totalPrice: 0 } }, { new: true })
 
 
+        return res.status(200).send({ status: true, data: cartDeleted })
     }
-    catch {
-
-
+    catch (err) {
+        res.status(500).send({ status: false, message: err })
     }
 }
 
