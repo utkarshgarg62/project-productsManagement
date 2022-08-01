@@ -28,7 +28,7 @@ const createProducts = async function (req, res) {
 
         //*************************** [DESTRUCTURINGP DATA] ********************/
 
-        let { title, description, price, currencyId, currencyFormat,isFreeShipping, style, installments } = data;
+        let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, installments } = data;
 
         //*************************** [CHECKING VALIDATION OF REQUIRED :TRUE] ********************/
 
@@ -85,7 +85,7 @@ const createProducts = async function (req, res) {
 
         let availableSizes = req.body.availableSizes.split(",").map(x => x.trim())
 
-        for (let i = 0; i < availableSizes.length; i++) {
+        for (let i = 0; i < availableSizes.length; i++) {       // <=== running a for loop here
 
             if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(availableSizes[i]))) {
                 // console.log(availableSizes[i])
@@ -129,8 +129,8 @@ const createProducts = async function (req, res) {
 //================================================[GET API]===================================================================================
 
 
-
 const getProduct = async function (req, res) {
+
     try {
         let filter = req.query;
         let query = { isDeleted: false };
@@ -141,43 +141,41 @@ const getProduct = async function (req, res) {
 
             //*************************** [Filtering By Size] ***********************/
 
-            if(isValid(size)){
-                if(!isValid(size)){ return res.status(400).send({status : false, message : "Enter size"})}   
+            if (isValid(size)) {
+                if (!isValid(size)) { return res.status(400).send({ status: false, message: "Enter size" }) }
                 query['availableSizes'] = size.toUpperCase()
             }
 
             //*************************** [Filtering By Name] ***********************/
 
 
-            if (isValid(name)) {
-                query['title'] = name;
-            }
+            if (isValid(name)) { query['title'] = name }
 
             //*************************** [Filtering By Price Greater Than] ***********************/
 
-            if(isValid(priceGreaterThan)){
-                if(!isValid(priceGreaterThan)){ return res.status(400).send({status : false, messsage : "Enter value for priceGreaterThan field"}) }
-                query['price'] = { '$gt' : priceGreaterThan}
+            if (isValid(priceGreaterThan)) {
+                if (!isValid(priceGreaterThan)) { return res.status(400).send({ status: false, messsage: "Enter value for priceGreaterThan field" }) }
+                query['price'] = { '$gt': priceGreaterThan }
             }
-     
+
 
             //*************************** [Filtering By Price less Than] ***********************/
 
-            if(isValid(priceLessThan)){
-                if(!isValid(priceLessThan)){ return res.status(400).send({status : false, messsage : "Enter value for priceLessThan"}) }
-                query['price'] = { '$lt' : priceLessThan}
+            if (isValid(priceLessThan)) {
+                if (!isValid(priceLessThan)) { return res.status(400).send({ status: false, messsage: "Enter value for priceLessThan" }) }
+                query['price'] = { '$lt': priceLessThan }
             }
-
-
         }
 
-        let data = await productModel.find(query).sort({ price: 1 });
+        let data = await productModel.find(query).sort({ price: -1 }); 
 
         if (data.length == 0) {
             return res.status(400).send({ status: false, message: "NO data found" });
         }
 
-        return res.status(200).send({ status: true, message: "Success", count: data.length, data: data });
+        return res.status(200).send({ status: true, message: "Success",count: data.length, data: data });
+
+
     } catch (err) {
         return res.status(500).send({ status: false, error: err.message });
     }
@@ -222,11 +220,10 @@ const updateProduct = async function (req, res) {
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments } = data
 
 
-
         if (files) {
             if (isValidReqBody(files)) {
                 if (!(files && files.length > 0 || files == "")) {
-                    return res.status(400).send({ status: false, message: "please provide product image" })
+                    return res.status(400).send({ status: false, message: "files provide product image" })
                 }
                 var updatedProductImage = await config.uploadFile(files[0])
             }

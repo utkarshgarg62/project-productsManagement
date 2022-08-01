@@ -1,18 +1,18 @@
 const userModel = require('../models/userModel')
-const aws=require("../aws/aws_config")
+const aws = require("../aws/aws_config")
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-const { 
-    isValid, 
-    isValidObjectId, 
-    isValidName, 
-    isValidEmail, 
-    isValidMobile, 
-    isValidPassword, 
-    isValidReqBody, 
-    isValidPincode 
+const {
+    isValid,
+    isValidObjectId,
+    isValidName,
+    isValidEmail,
+    isValidMobile,
+    isValidPassword,
+    isValidReqBody,
+    isValidPincode
 } = require("../middleware/validation")
 
 
@@ -45,8 +45,7 @@ const createUser = async function (req, res) {
         let files = req.files
         if (!(files && files.length)) {
             return res.status(400).send({ status: false, message: "Please Provide Profile Image" });
-        }
-        let uploadedprofileImage = await aws.uploadFile(files[0])
+        } let uploadedprofileImage = await aws.uploadFile(files[0])
         data.profileImage = uploadedprofileImage
 
 
@@ -177,7 +176,7 @@ const getUserById = async function (req, res) {
 
 
 const updateUser = async function (req, res) {
-  
+
     try {
 
 
@@ -207,20 +206,20 @@ const updateUser = async function (req, res) {
             data.profileImage = updatedProfileImage
         }
 
-        if (isValid(fname) || fname =="" ) {
+        if (isValid(fname) || fname == "") {
             if (!isValid(fname)) { return res.status(400).send({ status: false, message: "Please Provide First Name" }) }
             if (!isValidName(fname)) { return res.status(400).send({ status: false, message: "Enter a Valid Fname !" }) }
             userProfile.fname = fname
         }
 
 
-        if (isValid(lname) || lname =="" ) {
+        if (isValid(lname) || lname == "") {
             if (!isValid(lname)) { return res.status(400).send({ status: false, message: "Please Provide Last Name" }) }
             if (!isValidName(lname)) { return res.status(400).send({ status: false, message: "Enter a Valid Lname !" }) }
             userProfile.lname = lname
         }
 
-        if (isValid(email) || email =="" ) {
+        if (isValid(email) || email == "") {
             if (!isValid(email)) { return res.status(400).send({ status: false, message: "Please Provide Email" }) }
             if (!isValidEmail(email)) { return res.status(400).send({ status: false, message: "Enter a Valid Email !" }) }
 
@@ -231,7 +230,7 @@ const updateUser = async function (req, res) {
 
 
 
-        if (isValid(phone) || phone =="" ) {
+        if (isValid(phone) || phone == "") {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }
             if (!isValidMobile(phone)) { return res.status(400).send({ status: false, message: "Enter a Valid Phone Number! " }) }
 
@@ -240,7 +239,7 @@ const updateUser = async function (req, res) {
             userProfile.phone = phone
         }
 
-        if (isValid(password) || password =="" ) {
+        if (isValid(password) || password == "") {
             if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
             if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Enter a Valid password 8 min and 15 max !" }) }
 
@@ -252,7 +251,7 @@ const updateUser = async function (req, res) {
         //Address validation ->
         if (isValid(address)) {
             let add = JSON.parse(data.address)
-            data.address=add
+            data.address = add
 
 
             if (add.shipping) {
@@ -264,7 +263,7 @@ const updateUser = async function (req, res) {
                         return res.status(400).send({ status: false, message: "Shipping address street not valid" })
                     userProfile.address.shipping.street = add.shipping.street
 
-                }if (add.shipping.city) {
+                } if (add.shipping.city) {
                     if (!isValid(add.shipping.city))
                         return res.status(400).send({ status: false, message: "Shipping address city not valid" })
                     userProfile.address.shipping.city = add.shipping.city
