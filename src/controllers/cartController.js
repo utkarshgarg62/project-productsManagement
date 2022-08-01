@@ -72,6 +72,7 @@ const addToCart = async function (req, res) {
 
 
 const updateCart = async function (req, res) {
+
     try {
 
         let userId = req.params.userId
