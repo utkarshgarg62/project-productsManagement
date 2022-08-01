@@ -10,14 +10,17 @@ const { isValidObjectId, isValidReqBody, } = require("../middleware/validation")
 const addToCart = async function (req, res) {
     try {
         let userIdInPath = req.params.userId
+        if(!isValidObjectId(userIdInPath)){return res.status(404).send({ status: false, message: "Invalid UserId" })}
+
         let checkUserId = await userModel.findById({ _id: userIdInPath })
         if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
 
         let data = req.body
 
-        let { productId, quantity } = data
+        let { productId } = data
+
+        if(!isValidReqBody(productId)){return res.status(404).send({ status: false, message: "Please Provide ProductId" })}
         if(!isValidObjectId(productId)){return res.status(404).send({ status: false, message: "Invalid ProductId" })}
-        // if(!NaN(quantity)){return res.status(404).send({ status: false, message: "Enter A Valid Quantity" })}
 
         let checkProduct = await productModel .findOne({_id:productId,isDeleted:false})
         if(!checkProduct){ return res.status(404).send({ status: false, message: "Product Do Not Exits or DELETED" }) }
@@ -25,35 +28,30 @@ const addToCart = async function (req, res) {
         let arr1=[]
         let products = {
             productId:productId,
-            quantity:quantity
+            quantity:1
         }
         arr1.push(products)
         let totalPriceCalculated = checkProduct.price * products.quantity
 
         let checkCartExitsForUserId = await cartModel.findOne({ userId: userIdInPath })
 
-        // IF CART IS NOT FOUND IN DB
-        if (!checkCartExitsForUserId) {
-            let dataToBeCreated = {
-                userId: userIdInPath,
-                items: arr1,
-                totalPrice: totalPriceCalculated,
-                totalItems: 1
-            }
-            let createdData = await cartModel.create(dataToBeCreated)
-            return res.status(201).send({ status: true, message: "Success", data: createdData })
-        }
-
-        // IF CART IS FOUND IN DB
-        else {
+        // IF CART IS FOUND IN DB // TO ADD PRODUCTS IF CART IS ALREADY CREATED
+        if(checkCartExitsForUserId){
             let arr2= checkCartExitsForUserId.items
             let productAdded = {
                 productId:productId,
-                quantity:quantity
+                quantity:1
             }
-            arr2.push(productAdded)
+            let compareProductId = arr2.findIndex((obj) => obj.productId == productId);
+            // console.log(compareProductId)
+            if (compareProductId == -1) {
+                arr2.push(productAdded)
+            } else {
+                arr2[compareProductId].quantity += 1;
+            }
+
             let totalPriceUpdated = checkCartExitsForUserId.totalPrice + (checkProduct.price * products.quantity)
-            let totalItemsUpdated = checkCartExitsForUserId.totalItems + 1
+            let totalItemsUpdated = arr2.length
 
             let dataToBeAdded = {
                 items: arr2,
@@ -65,6 +63,18 @@ const addToCart = async function (req, res) {
                 { new: true }
             )
             return res.status(201).send({ status: true, message: "Successfully Added", data: updatedData })
+        }
+
+        // IF CART IS NOT FOUND IN DB // TO ADD PRODUCT AND CREATE CART
+        if (!checkCartExitsForUserId) {
+            let dataToBeCreated = {
+                userId: userIdInPath,
+                items: arr1,
+                totalPrice: totalPriceCalculated,
+                totalItems: 1
+            }
+            let createdData = await cartModel.create(dataToBeCreated)
+            return res.status(201).send({ status: true, message: "Success", data: createdData })
         }
     }
     catch (err) {
