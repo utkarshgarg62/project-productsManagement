@@ -102,6 +102,9 @@ const updateCart = async function (req, res) {
         if (!isValidReqBody(productId)) { return res.status(404).send({ status: false, message: "Please Provide ProductId" }) }
         if (!isValidObjectId(productId)) { return res.status(404).send({ status: false, message: "Invalid ProductId" }) }
 
+        if (!(removeProduct == 1 || removeProduct == 0)) {
+            return res.status(400).send({ status: false, message: "Remove Product Should only be 1 and 0 (1 - To Reduce Quantity & 0 - To Remove Product)" })
+        }
         let checkProduct = await productModel.findOne({ _id: productId, isDeleted: false })
         if (!checkProduct) { return res.status(404).send({ status: false, message: "Product Do Not Exits or DELETED" }) }
 
