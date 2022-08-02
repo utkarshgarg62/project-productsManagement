@@ -23,9 +23,15 @@ router.delete('/products/:productId', productController.deleteProduct)
 router.post('/users/:userId/cart', 
             // middleware.authentication, middleware.authorization, 
             cartController.addToCart)
-router.put('/users/:userId/cart', middleware.authentication, middleware.authorization, cartController.updateCart)
-router.get('/users/:userId/cart', middleware.authentication, middleware.authorization, cartController.getCart)
-router.delete('/users/:userId/cart', cartController.deleteCart)
+router.put('/users/:userId/cart', 
+            // middleware.authentication, middleware.authorization, 
+            cartController.updateCart)
+router.get('/users/:userId/cart', 
+            // middleware.authentication, middleware.authorization, 
+            cartController.getCart)
+router.delete('/users/:userId/cart', 
+            // middleware.authentication, middleware.authorization, 
+            cartController.deleteCart)
 
 // Order APIs
 router.post('/users/:userId/orders', orderController.createOrder)
