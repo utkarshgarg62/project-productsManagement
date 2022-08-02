@@ -158,8 +158,9 @@ const updateCart = async function (req, res) {
                 }
                 else {
                     let arr3 = arr2.splice(compareProductId, 1)
-
-                    let quantity = arr3[compareProductId].quantity
+                    // console.log(arr3)
+                    let quantity = arr3[0].quantity
+                    // console.log(quantity)
                     let totalPriceUpdated = checkCartExitsForUserId.totalPrice - (checkProduct.price * quantity)
                     let totalItemsUpdated = arr2.length
 
