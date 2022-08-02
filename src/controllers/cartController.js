@@ -124,6 +124,10 @@ const updateCart = async function (req, res) {
             } 
             else {
                 arr1[compareProductId].quantity -= 1;
+                // console.log(arr1[compareProductId].quantity);
+                if(arr1[compareProductId].quantity==0){
+                    arr1.splice(compareProductId,1)
+                }
             }
 
             let totalPriceUpdated = checkCartExitsForUserId.totalPrice - (checkProduct.price)
@@ -153,20 +157,23 @@ const updateCart = async function (req, res) {
                 return res.status(200).send({status:false, message:"ProductId is not available in the cart"})
             } 
             else {
-               arr2.splice(compareProductId,1)
-            }
+               let arr3=arr2.splice(compareProductId,1)
+               
+            let quantity=arr3[compareProductId].quantity
+            let totalPriceUpdated = checkCartExitsForUserId.totalPrice - (checkProduct.price * quantity)
+            let totalItemsUpdated = arr2.length
 
             let dataToBeUpdated = {
                 items: arr2,
-                totalPrice: 0,
-                totalItems: 0
+                totalPrice: totalPriceUpdated,
+                totalItems: totalItemsUpdated
             }
             let updatedData = await cartModel.findOneAndUpdate({ userId: userIdInPath },
                 dataToBeUpdated,
                 { new: true }
             )
             return res.status(200).send({ status: true, message: "Successfully Removed Product", data: updatedData })
-
+            }
         }
 
     }
