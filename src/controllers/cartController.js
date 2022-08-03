@@ -108,7 +108,7 @@ const updateCart = async function (req, res) {
         let checkProduct = await productModel.findOne({ _id: productId, isDeleted: false })
         if (!checkProduct) { return res.status(404).send({ status: false, message: "Product Do Not Exits or DELETED" }) }
 
-
+        // DB CALL TO CHECK WHETHER THE CART EXISTS AUR NOT 
         let checkCartExitsForUserId = await cartModel.findOne({ userId: userIdInPath })
 
         // IF CART IS FOUND IN DB // TO ADD PRODUCTS IF CART IS ALREADY CREATED
@@ -116,10 +116,10 @@ const updateCart = async function (req, res) {
 
             if (removeProduct == 1) {
                 let arr1 = checkCartExitsForUserId.items
-                let products = {
-                    productId: productId,
-                    quantity: 1
-                }
+                // let products = {
+                //     productId: productId,
+                //     quantity: 1
+                // }
                 let compareProductId = arr1.findIndex((obj) => obj.productId == productId);
                 // console.log(compareProductId)
                 if (compareProductId == -1) {
@@ -151,10 +151,10 @@ const updateCart = async function (req, res) {
             if (removeProduct == 0) {
 
                 let arr2 = checkCartExitsForUserId.items
-                let products = {
-                    productId: productId,
-                    quantity: 1
-                }
+                // let products = {
+                //     productId: productId,
+                //     quantity: 1
+                // }
                 let compareProductId = arr2.findIndex((obj) => obj.productId == productId);
                 if (compareProductId == -1) {
                     return res.status(200).send({ status: false, message: "ProductId is not available in the cart" })

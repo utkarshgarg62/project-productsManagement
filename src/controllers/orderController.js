@@ -1,4 +1,5 @@
 const orderModel = require("../models/orderModel")
+const userModel = require("../models/userModel")
 
 
 //================================================[CREATE ORDER API=======================================================================
@@ -6,12 +7,25 @@ const orderModel = require("../models/orderModel")
 
 const createOrder = async function (req, res) {
     try {
-        let userId =req.params.userId
+        let userIdInPath =req.params.userId
+        if (!isValidObjectId(userIdInPath)) { return res.status(404).send({ status: false, message: "Invalid UserId" }) }
+
+        let checkUserId = await userModel.findById({ _id: userIdInPath })
+        if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
+
         let data =req.body
+        let { items,totalPrice,totalItems,totalQuantity,cancellable,status,deletedAt,isDeleted }= data
+
         let dataToBeAdded = {
             userId:userId,
-
-
+            items,
+            totalPrice,
+            totalItems,
+            totalQuantity,
+            cancellable,
+            status,
+            deletedAt,
+            isDeleted
         }
         let createdOrder = await orderModel .create(dataToBeAdded)
         res.status(201).send({status: true, message: 'Success', data: createdOrder })
