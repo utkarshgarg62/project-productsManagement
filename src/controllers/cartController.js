@@ -23,34 +23,28 @@ const addToCart = async function (req, res) {
         if (!isValidObjectId(productId)) { return res.status(404).send({ status: false, message: "Invalid ProductId" }) }
 
         let checkProduct = await productModel.findOne({ _id: productId, isDeleted: false })
-        if (!checkProduct) { return res.status(404).send({ status: false, message: "Product Do Not Exits or DELETED" }) }
+        if (!checkProduct) { return res.status(404).send({ status: false, message: "Product Do Not Exists or DELETED" }) }
+        
 
-        let arr1 = []
-        let products = {
-            productId: productId,
-            quantity: 1
-        }
-        arr1.push(products)
-        let totalPriceCalculated = checkProduct.price * products.quantity
+        // DB CALL TO CHECK WHETHER THE CART IS PRESENT OR NOT FOR THAT USER
+        let checkCartExistsForUserId = await cartModel.findOne({ userId: userIdInPath })
 
-        let checkCartExitsForUserId = await cartModel.findOne({ userId: userIdInPath })
-
-        // IF CART IS FOUND IN DB // TO ADD PRODUCTS IF CART IS ALREADY CREATED
-        if (checkCartExitsForUserId) {
-            let arr2 = checkCartExitsForUserId.items
+        // IF CART IS FOUND IN DB // TO ADD PRODUCTS
+        if (checkCartExistsForUserId) {
+            let arr2 = checkCartExistsForUserId.items
             let productAdded = {
                 productId: productId,
                 quantity: 1
             }
-            let compareProductId = arr2.findIndex((obj) => obj.productId == productId);
+            let compareProductId = arr2.findIndex((obj) => obj.productId == productId);  // 2nd productid- req.body mile gai
             // console.log(compareProductId)
-            if (compareProductId == -1) {
-                arr2.push(productAdded)
+            if (compareProductId == -1) {  // AGAR PRODUCTID MATCH NI HOTI HAI
+                arr2.push(productAdded)     // ADDING NEW PRODUCT
             } else {
-                arr2[compareProductId].quantity += 1;
+                arr2[compareProductId].quantity += 1;       // INCREASING QUANTITY
             }
 
-            let totalPriceUpdated = checkCartExitsForUserId.totalPrice + (checkProduct.price * products.quantity)
+            let totalPriceUpdated = checkCartExistsForUserId.totalPrice + (checkProduct.price)
             let totalItemsUpdated = arr2.length
 
             let dataToBeAdded = {
@@ -66,7 +60,17 @@ const addToCart = async function (req, res) {
         }
 
         // IF CART IS NOT FOUND IN DB // TO ADD PRODUCT AND CREATE CART
-        if (!checkCartExitsForUserId) {
+        if (!checkCartExistsForUserId) {
+            
+            let arr1 = []
+            let products = {
+                productId: productId,
+                quantity: 1
+            }
+            arr1.push(products)
+
+            let totalPriceCalculated = checkProduct.price * products.quantity
+
             let dataToBeCreated = {
                 userId: userIdInPath,
                 items: arr1,
@@ -110,10 +114,10 @@ const updateCart = async function (req, res) {
         if (!checkProduct) { return res.status(404).send({ status: false, message: "Product Do Not Exits or DELETED" }) }
 
         // DB CALL TO CHECK WHETHER THE CART EXISTS AUR NOT 
-        let checkCartExitsForUserId = await cartModel.findOne({ userId: userIdInPath })
+        let checkCartExistsForUserId = await cartModel.findOne({ userId: userIdInPath })
 
             // STORING THE ITEMS DATA (ARR) IN arr1 (TAKING ITEMS FROM ABOVE DB CALL)
-            let arr1 = checkCartExitsForUserId.items
+            let arr1 = checkCartExistsForUserId.items
 
             // FINDING THE INDEX OF THE USER GIVEN PRODUCTID WHETHER PRESENT IN DB OR NOT IN CART ITEMS
             let compareProductId = arr1.findIndex((obj) => obj.productId == productId);
@@ -124,7 +128,7 @@ const updateCart = async function (req, res) {
             }
 
         // IF CART IS FOUND IN DB // TO REDUCE AND REMOVE PRODUCT FROM CART
-        if (checkCartExitsForUserId) {
+        if (checkCartExistsForUserId) {
 
             // IF USER GIVE REMOVEPRODUCT VALUE AS 1
             if (removeProduct == 1) {
@@ -134,7 +138,7 @@ const updateCart = async function (req, res) {
                     arr1.splice(compareProductId, 1)
                 }
 
-                let totalPriceUpdated = checkCartExitsForUserId.totalPrice - (checkProduct.price)
+                let totalPriceUpdated = checkCartExistsForUserId.totalPrice - (checkProduct.price)
                 let totalItemsUpdated = arr1.length
 
                 let dataToBeUpdated = {
@@ -154,7 +158,7 @@ const updateCart = async function (req, res) {
 
                 let arr2 = arr1.splice(compareProductId, 1)
                 let quantity = arr2[0].quantity
-                let totalPriceUpdated = checkCartExitsForUserId.totalPrice - (checkProduct.price * quantity)
+                let totalPriceUpdated = checkCartExistsForUserId.totalPrice - (checkProduct.price * quantity)
                 let totalItemsUpdated = arr1.length
 
                 let dataToBeUpdated = {
@@ -172,7 +176,7 @@ const updateCart = async function (req, res) {
         }
 
         // IF CART IS NOT FOUND IN DB 
-        if (!checkCartExitsForUserId) {
+        if (!checkCartExistsForUserId) {
             return res.status(400).send({ status: false, message: "Cart Do Not Exits" })
         }
 
