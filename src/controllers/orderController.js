@@ -57,6 +57,7 @@ const createOrder = async function (req, res) {
 
 const updateOrder = async function (req, res) {
     try {
+
         let data = req.body
         let { orderId, status } = data
 
@@ -72,15 +73,19 @@ const updateOrder = async function (req, res) {
         let order = await orderModel.findOne({ _id: orderId, isDeleted: false })
         if (!order) { return res.status(404).send({ status: false, message: "Order is not exist in DB" }) }
 
+        // STATUS VALIDATION
+        if(!isValid(status)){ return res.status(400).send({ status: false, message: "Please Provide status" }) }
+        if (status || status == "") {
+            if (!((status == 'canceled') || (status == 'completed'))) { return res.status(400).send({ status: false, message: "'canceled', 'completed' are suitable for the status " }) }
+        }
 
+        // SOME CASES TO BE HANDLED
         if(order.cancellable==false && status == "canceled"){
             return res.status(400).send({status:false,message:"user can not cancel this order as this order has cancellable - false"})
         }
 
-        // STATUS VALIDATION
-        if (status || status == "") {
-            if (!isValid(status)) { return res.status(400).send({ status: false, message: "Please Provide status" }) }
-            if (!((status == 'canceled') || (status == 'completed'))) { return res.status(400).send({ status: false, message: "'canceled', 'completed' are suitable for the status " }) }
+        if(order.status=='pending' && status == "canceled"){
+            return res.status(400).send({status:false,message:"You have not completed your order yet"})
         }
 
         if(order.status=='completed' && status == "completed"){
