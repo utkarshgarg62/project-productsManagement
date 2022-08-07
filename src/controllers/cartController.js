@@ -159,7 +159,7 @@ const updateCart = async function (req, res) {
 
                 arr1[compareProductId].quantity -= 1;        // REDUCING QUANTITY BY 1
                 if (arr1[compareProductId].quantity == 0) {  // IF QUANTITY GOES BELOW 1
-                    arr1.splice(compareProductId, 1)
+                    arr1.splice(compareProductId, 1)         // REMOVE THE PRODUCT FROM ITEMS IF QUATITY GOES BELOW 1
                 }
 
                 // GETTING TOTAL PRICE AFTER REMOVE PRODUCT IN ARRAY AND DEACREASING IN PRICE 
@@ -237,7 +237,7 @@ const getCart = async function (req, res) {
         // CHECKING WHEATHER CART EXISTS FOR THE GIVEN USER OR NOT
         let cartData = await cartModel.findOne({ userId: userId })
         if (!cartData) {return res.status(400).send({ status: false, message: "this user has no cart" })}
-        
+
         res.status(200).send({ status: true, data: cartData })
     }
     catch (err) {

@@ -14,17 +14,24 @@ const createOrder = async function (req, res) {
 
         let userIdInPath =req.params.userId
 
+        // VALIDATING THE USER_ID
         if (!isValidObjectId(userIdInPath)) { return res.status(400).send({ status: false, message: "Invalid UserId" }) }
+
+        // VALIDATING THE CART_ID
         if (!isValidObjectId(cartId)) { return res.status(400).send({ status: false, message: "Invalid cartId" }) }
 
+        // CHECKING WHEATHER USER_ID IS PRESENT IN USER_MODEL OR NOT
         let checkUserId = await userModel.findById({ _id: userIdInPath })
         if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
         
+        // CHECKING WHEATHER CART_ID IS PRESENT IN CART_MODEL OR NOT
         let cartDetails = await cartModel .findOne({_id:cartId})
         if(!cartDetails){return res.status(404).send({status:false,message:"Cart Do not Exists"})}
 
+        // IF ITEMS HAS LENGTH 0 
         if(cartDetails.items.length ===0 ){return res.status(400).send({status:false,message:"Your Cart is Empty. You can't proceed further"})}
 
+        // VALIDATING THE CANCELLABLE 
         if(cancellable){
             if(!(cancellable==false || cancellable==true )){return res.status(400).send({status:false,message:"Enter Only true / false in cancellable"})}
 
@@ -37,7 +44,7 @@ const createOrder = async function (req, res) {
         }
         let totalQuantity = sum
         
-
+        //STORING ALL THE ITEMS WHICH WE WANT TO CREATE IN A SINGLE VARIABLE NAMED AS - (DATA_TO_BE_ADDED)
         let dataToBeAdded = {
             userId:cartDetails.userId,
             items:cartDetails.items,
@@ -46,6 +53,7 @@ const createOrder = async function (req, res) {
             totalQuantity:totalQuantity,
             cancellable:data.cancellable,
         }
+
         let createdOrder = await orderModel .create(dataToBeAdded)
         res.status(201).send({status: true, message: 'Success', data: createdOrder })
 
@@ -66,14 +74,21 @@ const updateOrder = async function (req, res) {
         let { orderId, status } = data
 
         let userIdInPath = req.params.userId
+
+        // VALIDATING THE USER_ID
         if (!isValidObjectId(userIdInPath)) { return res.status(400).send({ status: false, message: "Invalid userId" }) }
+
+        // VALIDATING THE ORDER_ID
         if (!isValidObjectId(orderId)) { return res.status(400).send({ status: false, message: "Invalid orderId" }) }
 
+        // CHECKING WHEATHER USER_ID PRESENT IN USER_MODEL OR NOT
         let checkUserId = await userModel.findById({ _id: userIdInPath })
         if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
 
+        // IF USER IS GIVING NOTHING / EMPTY REQ.BODY
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
+        // CHECKING THE ORDER_ID PRESENT IN CART_MODEL OR NOT
         let order = await orderModel.findOne({ _id: orderId })
         if (!order) { return res.status(404).send({ status: false, message: "Order is not exist in DB" }) }
 

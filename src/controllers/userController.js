@@ -140,7 +140,7 @@ const loginUser = async function (req, res) {
 
     }
     catch (err) {
-        res.status(500).send({ status: false, message: err.message })
+        res.status(500).send({ status: false, message: err })
     }
 }
 
@@ -157,16 +157,14 @@ const getUserById = async function (req, res) {
 
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
 
-        const userData = await userModel.findOne({ _id: userId })
-            // .select({ address: 1, _id: 1, fname: 1, lname: 1, email: 1, profileImage: 1, phone: 1, password: 1 })
-
+        let userData = await userModel.findOne({ _id: userId })
         if (!userData) return res.status(404).send({ status: false, message: "User not found " })
 
         res.status(200).send({ status: true, message: "User profile details", data: userData })
 
     }
     catch (err) {
-        res.status(500).send({ status: false, message: err.message })
+        res.status(500).send({ status: false, message: err })
 
     }
 }
@@ -244,7 +242,7 @@ const updateUser = async function (req, res) {
             if (!isValid(password)) { return res.status(400).send({ status: false, message: "Please Provide Password" }) }
             if (!isValidPassword(password)) { return res.status(400).send({ status: false, message: "Enter a Valid password 8 min and 15 max !" }) }
 
-            const hashedPass = bcrypt.hashSync(data.password, saltRounds);     // <== 
+            const hashedPass = bcrypt.hashSync(data.password, saltRounds);
             data.password = hashedPass
         }
 
@@ -305,7 +303,7 @@ const updateUser = async function (req, res) {
         res.status(200).send({ status: true, message: "User profile Updated", data: Updatedata })
     }
     catch (err) {
-        res.status(500).send({ status: false, message: err.message })
+        res.status(500).send({ status: false, message: err })
     }
 }
 
