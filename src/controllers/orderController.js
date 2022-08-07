@@ -4,7 +4,7 @@ const userModel = require("../models/userModel")
 const { isValid, isValidObjectId, isValidReqBody } = require("../middleware/validation")
 
 
-//================================================[CREATE ORDER API=======================================================================
+//================================================[CREATE ORDER API]=======================================================================
 
 
 const createOrder = async function (req, res) {
@@ -46,6 +46,8 @@ const createOrder = async function (req, res) {
         }
         let createdOrder = await orderModel .create(dataToBeAdded)
         res.status(201).send({status: true, message: 'Success', data: createdOrder })
+
+        await cartModel.findOneAndUpdate({ userId: userIdInPath },{ $set: { items: [], totalItems: 0, totalPrice: 0 } })
     }
     catch(err) {
         res.status(500).send({status: false, message:err })
@@ -70,7 +72,7 @@ const updateOrder = async function (req, res) {
 
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
-        let order = await orderModel.findOne({ _id: orderId, isDeleted: false })
+        let order = await orderModel.findOne({ _id: orderId })
         if (!order) { return res.status(404).send({ status: false, message: "Order is not exist in DB" }) }
 
         // STATUS VALIDATION
@@ -82,10 +84,6 @@ const updateOrder = async function (req, res) {
         // SOME CASES TO BE HANDLED
         if(order.cancellable==false && status == "canceled"){
             return res.status(400).send({status:false,message:"user can not cancel this order as this order has cancellable - false"})
-        }
-
-        if(order.status=='pending' && status == "canceled"){
-            return res.status(400).send({status:false,message:"You have not completed your order yet"})
         }
 
         if(order.status=='completed' && status == "completed"){
@@ -103,8 +101,6 @@ const updateOrder = async function (req, res) {
         let updatedOrder = await orderModel.findByIdAndUpdate({ _id: orderId }, data, { new: true })
         res.status(200).send({ status: true, message: 'Success', data: updatedOrder })
 
-        let items = []
-        await cartModel.findOneAndUpdate({ userId: userIdInPath },{ $set: { items: items, totalItems: 0, totalPrice: 0 } })
 
     }
     catch(err) {

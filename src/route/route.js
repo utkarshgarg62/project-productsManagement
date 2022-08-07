@@ -9,7 +9,7 @@ const middleware = require('../middleware/middleware')
 // User APIs 
 router.post('/register', userController.createUser)
 router.post('/login', userController.loginUser)
-router.get('/user/:userId/profile', middleware.authentication, userController.getUserById)
+router.get('/user/:userId/profile', middleware.authentication,middleware.authorization, userController.getUserById)
 router.put('/user/:userId/profile', middleware.authentication, middleware.authorization, userController.updateUser)
 
 // Product APIs
@@ -20,22 +20,13 @@ router.put('/products/:productId', productController.updateProduct)
 router.delete('/products/:productId', productController.deleteProduct)
 
 // Cart APIs
-router.post('/users/:userId/cart', 
-            // middleware.authentication, middleware.authorization, 
-            cartController.addToCart)
-router.put('/users/:userId/cart', 
-            // middleware.authentication, middleware.authorization, 
-            cartController.updateCart)
-router.get('/users/:userId/cart', 
-            // middleware.authentication, middleware.authorization, 
-            cartController.getCart)
-router.delete('/users/:userId/cart', 
-            // middleware.authentication, middleware.authorization, 
-            cartController.deleteCart)
+router.post('/users/:userId/cart', middleware.authentication, middleware.authorization, cartController.addToCart)
+router.put('/users/:userId/cart', middleware.authentication, middleware.authorization, cartController.updateCart)
+router.get('/users/:userId/cart', middleware.authentication, middleware.authorization, cartController.getCart)
+router.delete('/users/:userId/cart', middleware.authentication, middleware.authorization, cartController.deleteCart)
 
 // Order APIs
-router.post('/users/:userId/orders', orderController.createOrder)
-router.put('/users/:userId/orders', orderController.updateOrder)
-
+router.post('/users/:userId/orders', middleware.authentication, middleware.authorization, orderController.createOrder)
+router.put('/users/:userId/orders', middleware.authentication, middleware.authorization, orderController.updateOrder)
 
 module.exports = router;

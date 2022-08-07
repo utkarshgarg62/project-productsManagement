@@ -158,11 +158,11 @@ const getUserById = async function (req, res) {
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
 
         const userData = await userModel.findOne({ _id: userId })
-            .select({ address: 1, _id: 1, fname: 1, lname: 1, email: 1, profileImage: 1, phone: 1, password: 1 })
+            // .select({ address: 1, _id: 1, fname: 1, lname: 1, email: 1, profileImage: 1, phone: 1, password: 1 })
 
         if (!userData) return res.status(404).send({ status: false, message: "User not found " })
 
-        res.status(200).send({ status: true, message: "user profile details", data: userData })
+        res.status(200).send({ status: true, message: "User profile details", data: userData })
 
     }
     catch (err) {
@@ -302,7 +302,7 @@ const updateUser = async function (req, res) {
 
 
         let Updatedata = await userModel.findOneAndUpdate({ _id: userId }, data, { new: true })
-        res.status(201).send({ status: true, message: "User profile Updated", data: Updatedata })
+        res.status(200).send({ status: true, message: "User profile Updated", data: Updatedata })
     }
     catch (err) {
         res.status(500).send({ status: false, message: err.message })

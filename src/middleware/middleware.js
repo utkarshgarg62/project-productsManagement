@@ -14,13 +14,14 @@ const authentication = function (req, res, next) {
         let token1 = token.split(" ").pop() // For taking the last part as token we are using pop() 
         // console.log(token1)      // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiO...
 
-        let decodedToken = jwt.verify(token1, "project_5", (err, decodedToken) => {
+        let decodedToken = jwt.verify(token1, "project_5", 
+        (err, decodedToken) => {
             if (err) {
-                res.status(401).send({ status: false, Error: err.message })
+                return res.status(401).send({ status: false, Error: err.message })
             }
             req.userLoggedIn = decodedToken.userId
-        })
-
+        }
+        )
         next()
 
     } catch (err) {
