@@ -83,7 +83,6 @@ const validInstallment = function (value) {
     return installRegex.test(value)
 }
 
-
 module.exports = {
     isValidReqBody,
     isValid,

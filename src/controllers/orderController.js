@@ -10,6 +10,8 @@ const { isValid, isValidObjectId, isValidReqBody } = require("../middleware/vali
 const createOrder = async function (req, res) {
     try {
         let data =req.body
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
+        
         let { cartId, cancellable  }= data
 
         let userIdInPath =req.params.userId
@@ -71,6 +73,8 @@ const updateOrder = async function (req, res) {
     try {
 
         let data = req.body
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
+
         let { orderId, status } = data
 
         let userIdInPath = req.params.userId

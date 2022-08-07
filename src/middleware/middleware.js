@@ -8,7 +8,7 @@ const { isValidObjectId } = require("../middleware/validation");
 const authentication = function (req, res, next) {
     try {
         let token = req.headers["authorization"]
-        if (!token) return res.status(401).send({ status: false, message: "token is not present" })
+        if (!token) return res.status(401).send({ status: false, message: "Token is not Present" })
 
         // console.log(token)       // Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiO...
 
@@ -19,7 +19,7 @@ const authentication = function (req, res, next) {
         let decodedToken = jwt.verify(token1, "project_5", 
         (err, decodedToken) => {
             if (err) {
-                return res.status(401).send({ status: false, Error: err.message })
+                return res.status(401).send({ status: false, message: err })
             }
 
             // STORING THE DECODED TOKEN USER_ID IN A RESPONSE BODY , FOR FURTHER USE IN AUTHORIZATION
@@ -29,7 +29,7 @@ const authentication = function (req, res, next) {
         next()
 
     } catch (err) {
-        return res.status(500).send({ status: false, message: err.message })
+        return res.status(500).send({ status: false, message: err })
     }
 }
 
@@ -53,7 +53,7 @@ const authorization = async function (req, res, next) {
         if (fromParamsUserId) {
 
             // VALIDATING USER_ID
-            if (!isValidObjectId(fromParamsUserId)) return res.status(400).send({ status: false, msg: "enter valid userId" })
+            if (!isValidObjectId(fromParamsUserId)) return res.status(400).send({ status: false, msg: "Invalid UserId" })
 
             // CHECKING WHEATHER USER_ID IN A USER_MODEL
             let userdata = await userModel.findById(fromParamsUserId)
@@ -64,7 +64,7 @@ const authorization = async function (req, res, next) {
 
             // COMPARE THE BOTH USER_ID GETTING FROM PATH PARAMS AND DECODED TOKEN
             if (UserId != userLoggedIn) {
-                return res.status(403).send({ status: false, msg: "User logged is not allowed to change data of another user " })
+                return res.status(403).send({ status: false, message: "User logged is not allowed to change data of another user " })
             }
         }
 

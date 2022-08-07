@@ -137,7 +137,7 @@ const getProduct = async function (req, res) {
 
 
         if (filter) {
-            const { name, size, priceGreaterThan, priceLessThan } = filter;
+            const { name, size, priceSort, priceGreaterThan, priceLessThan } = filter;
 
             //*************************** [Filtering By Size] ***********************/
 
@@ -164,6 +164,21 @@ const getProduct = async function (req, res) {
             if (isValid(priceLessThan)) {
                 if (!isValid(priceLessThan)) { return res.status(400).send({ status: false, messsage: "Enter value for priceLessThan" }) }
                 query['price'] = { '$lt': priceLessThan }
+            }
+            if (priceLessThan && priceGreaterThan) { query['price'] = { '$lte': priceLessThan, '$gte': priceGreaterThan } }
+
+            //*************************** [Filtering By Price sort] ***********************/
+
+            if (priceSort) {
+                if ((priceSort == 1 || priceSort == -1)) {
+                    let filterProduct = await productModel.find(query).sort({ price: priceSort })
+
+                    if (!filterProduct) {
+                        return res.status(404).send({ status: false, message: "No products found with this query" })
+                    }
+                    return res.status(200).send({ status: false, message: "Success", data: filterProduct })
+                }
+                return res.status(400).send({ status: false, message: "priceSort must have 1 or -1 as input" })
             }
         }
 
@@ -230,7 +245,7 @@ const updateProduct = async function (req, res) {
             productProfile.productImage = updatedProductImage
         }
 
-        // CHECKING THE URL IS CORRECT OR NOT OR EMPTY  
+        // VALIDATING THE PRODUCT_ID
         if (!isValidObjectId(ProductId)) { return res.status(400).send({ status: false, message: "Invalid ProductId" }) }
 
         let Product = await productModel.findOne({ _id: ProductId, isDeleted: false })
@@ -331,11 +346,11 @@ const updateProduct = async function (req, res) {
 
 
         let updateData = await productModel.findOneAndUpdate({ _id: ProductId }, data, { new: true })
-        return res.status(201).send({ status: true, message: "User profile Updated", data: updateData })
+        return res.status(200).send({ status: true, message: "User profile Updated", data: updateData })
 
 
     } catch (err) {
-        return res.status(500).send({ status: false, message: err.message })
+        return res.status(500).send({ status: false, message: err })
     }
 }
 
@@ -347,6 +362,10 @@ const deleteProduct = async function (req, res) {
 
     try {
         let ProductId = req.params.productId
+
+        // VALIDATING THE PRODUCT_ID
+        if (!isValidObjectId(ProductId)) { return res.status(400).send({ status: false, message: "Invalid ProductId" }) }
+
         let date = new Date()
 
         let Product = await productModel.findOne({ _id: ProductId })

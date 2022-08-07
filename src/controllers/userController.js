@@ -25,7 +25,6 @@ const createUser = async function (req, res) {
     try {
 
         let data = req.body
-
         if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
 
         let { fname, lname, email, phone, password, address } = data
@@ -154,7 +153,6 @@ const getUserById = async function (req, res) {
     try {
 
         const userId = req.params.userId
-
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
 
         let userData = await userModel.findOne({ _id: userId })
@@ -177,18 +175,14 @@ const getUserById = async function (req, res) {
 const updateUser = async function (req, res) {
   
     try {
-
-
         let data = req.body;
         if (!isValidReqBody(data)) return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" });
 
         let userId = req.params.userId
         if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid userId" })
 
-
         let userProfile = await userModel.findById({ _id: userId })
         if (!userProfile) { return res.status(404).send({ status: false, message: "user not found" }) }
-
 
         let { fname, lname, email, phone, password, address, profileImage } = data
 
@@ -226,8 +220,6 @@ const updateUser = async function (req, res) {
             if (checkEmail) return res.status(400).send({ status: false, message: "Email already exists" })
             userProfile.email = email
         }
-
-
 
         if (isValid(phone) || phone =="" ) {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Please Provide Phone Number" }) }

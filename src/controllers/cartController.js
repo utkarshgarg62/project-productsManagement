@@ -17,6 +17,8 @@ const addToCart = async function (req, res) {
         if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
 
         let data = req.body
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
+
         let { productId } = data
         
         // TO CHECK WHEATHER PRODUCTID IS PRESENT OR NOT
@@ -120,6 +122,8 @@ const updateCart = async function (req, res) {
         if (!checkUserId) { return res.status(404).send({ status: false, message: "UserId Do Not Exits" }) }
 
         let data = req.body
+        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "Insert Data : BAD REQUEST" }); }
+
         let { productId, removeProduct } = data
 
         // TO CHECK WHEATHER PRODUCTID IS PRESENT OR NOT
@@ -232,7 +236,7 @@ const updateCart = async function (req, res) {
 const getCart = async function (req, res) {
     try {
         let userId = req.params.userId
-        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Incorrect user Id format" })
+        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
 
         // CHECKING WHEATHER CART EXISTS FOR THE GIVEN USER OR NOT
         let cartData = await cartModel.findOne({ userId: userId })
@@ -252,21 +256,22 @@ const getCart = async function (req, res) {
 const deleteCart = async function (req, res) {
     try {
         let userId = req.params.userId
+        if (!isValidObjectId(userId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
 
         // CHECKING WHEATHER USER IS PRESENT IN USER_MODEL OR NOT
         let checkUser = await userModel.findById(userId)
-        if (!checkUser) { return res.status(400).send({ status: false, msg: "user not found" }) }
+        if (!checkUser) { return res.status(400).send({ status: false, msg: "User not Found" }) }
 
         // CHECKING WHEATHER CART IS PRESENT FOR THE GIVEN USER OR NOT
         let Cart = await cartModel.findOne({ userId: userId })
-        if (!Cart) {return res.status(404).send({ status: false, msg: "cart not exists" })}
+        if (!Cart) {return res.status(404).send({ status: false, msg: "Cart Not Exists" })}
 
         // EMPTY THE CART BY [ FIND_ONE_AND_UPDATE ] METHOD
         let cartDeleted = await cartModel.findOneAndUpdate({ userId: userId },
             { $set: { items: [], totalItems: 0, totalPrice: 0 } }, 
             { new: true })
 
-        return res.status(200).send({ status: true, message: "Cart is Empty", data: cartDeleted })
+        return res.status(204).send({ status: true, message: "Cart is Empty", data: cartDeleted })
     }
     catch (err) {
         res.status(500).send({ status: false, message: err })
