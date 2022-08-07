@@ -30,11 +30,13 @@ const createOrder = async function (req, res) {
 
         }
         
+        // TO CHECK THE TOATAL QUANTITY OF ALL PRODUCTS
         let sum = 0;
         for (let i = 0; i < cartDetails.items.length; i++) {
             sum = sum + cartDetails.items[i].quantity
         }
         let totalQuantity = sum
+        
 
         let dataToBeAdded = {
             userId:cartDetails.userId,

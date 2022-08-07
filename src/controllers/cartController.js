@@ -133,8 +133,8 @@ const updateCart = async function (req, res) {
             // IF USER GIVE REMOVEPRODUCT VALUE AS 1
             if (removeProduct == 1) {
 
-                arr1[compareProductId].quantity -= 1;
-                if (arr1[compareProductId].quantity == 0) {
+                arr1[compareProductId].quantity -= 1;        // REDUCING QUANTITY BY 1
+                if (arr1[compareProductId].quantity == 0) {  // IF QUANTITY GOES BELOW 1
                     arr1.splice(compareProductId, 1)
                 }
 
