@@ -154,7 +154,7 @@ const getProduct = async function (req, res) {
             //*************************** [Filtering By Price Greater Than] ***********************/
 
             if (isValid(priceGreaterThan)) {
-                if (!isValid(priceGreaterThan)) { return res.status(400).send({ status: false, messsage: "Enter value for priceGreaterThan field" }) }
+                if (!isNumber(priceGreaterThan)) { return res.status(400).send({ status: false, messsage: "Enter a valid price in priceGreaterThan" }) }
                 query['price'] = { '$gt': priceGreaterThan }
             }
 
@@ -162,7 +162,7 @@ const getProduct = async function (req, res) {
             //*************************** [Filtering By Price less Than] ***********************/
 
             if (isValid(priceLessThan)) {
-                if (!isValid(priceLessThan)) { return res.status(400).send({ status: false, messsage: "Enter value for priceLessThan" }) }
+                if (!isNumber(priceLessThan)) { return res.status(400).send({ status: false, messsage: "Enter a valid price in priceLessThan" }) }
                 query['price'] = { '$lt': priceLessThan }
             }
             if (priceLessThan && priceGreaterThan) { query['price'] = { '$lte': priceLessThan, '$gte': priceGreaterThan } }
@@ -213,7 +213,7 @@ const getProductsById = async function (req, res) {
             return res.status(400).send({ status: false, message: "data is already deleted" })
         }
         else {
-            return res.status(200).send({ status: true, message: "success", data: data })
+            return res.status(200).send({ status: true, message: "Success", data: data })
         }
 
     } catch (err) {
@@ -346,7 +346,7 @@ const updateProduct = async function (req, res) {
 
 
         let updateData = await productModel.findOneAndUpdate({ _id: ProductId }, data, { new: true })
-        return res.status(200).send({ status: true, message: "User profile Updated", data: updateData })
+        return res.status(200).send({ status: true, message: "Update product details is successful", data: updateData })
 
 
     } catch (err) {
@@ -377,7 +377,7 @@ const deleteProduct = async function (req, res) {
 
 
         await productModel.findOneAndUpdate({ _id: ProductId }, { isDeleted: true, deletedAt: date }, { new: true })
-        return res.status(200).send({ status: true, message: "success", data: "Deleted Data" })
+        return res.status(200).send({ status: true, message: "Product deletion is successful", data: "Deleted Data" })
 
     } catch (err) {
         return res.status(500).send({ status: false, message: err })

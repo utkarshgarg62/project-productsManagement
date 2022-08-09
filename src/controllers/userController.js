@@ -158,7 +158,7 @@ const getUserById = async function (req, res) {
         let userData = await userModel.findOne({ _id: userId })
         if (!userData) return res.status(404).send({ status: false, message: "User not found " })
 
-        res.status(200).send({ status: true, message: "User profile details", data: userData })
+        res.status(200).send({ status: true, message: "Fetch user details is successful", data: userData })
 
     }
     catch (err) {
